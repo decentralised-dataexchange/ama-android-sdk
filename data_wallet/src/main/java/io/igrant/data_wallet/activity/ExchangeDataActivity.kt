@@ -1,0 +1,437 @@
+package io.igrant.data_wallet.activity
+
+import android.content.DialogInterface
+import android.content.Intent
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import android.view.View
+import android.widget.Button
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.widget.Toolbar
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
+import io.igrant.data_wallet.R
+import io.igrant.data_wallet.adapter.ExchangeRequestAttributeAdapter
+import io.igrant.data_wallet.communication.ApiManager
+import io.igrant.data_wallet.events.ReceiveExchangeRequestEvent
+import io.igrant.data_wallet.handlers.CommonHandler
+import io.igrant.data_wallet.handlers.PoolHandler
+import io.igrant.data_wallet.indy.LedgerNetworkType
+import io.igrant.data_wallet.indy.PoolManager
+import io.igrant.data_wallet.indy.WalletManager
+import io.igrant.data_wallet.models.MediatorConnectionObject
+import io.igrant.data_wallet.models.Notification
+import io.igrant.data_wallet.models.presentationExchange.CredentialValue
+import io.igrant.data_wallet.models.presentationExchange.ExchangeAttributes
+import io.igrant.data_wallet.models.presentationExchange.PresentationExchange
+import io.igrant.data_wallet.models.walletSearch.Record
+import io.igrant.data_wallet.tasks.ExchangeDataTask
+import io.igrant.data_wallet.tasks.LoadLibIndyTask
+import io.igrant.data_wallet.tasks.PoolTask
+import io.igrant.data_wallet.utils.MessageTypes
+import io.igrant.data_wallet.utils.SearchUtils
+import io.igrant.data_wallet.utils.WalletRecordType
+import io.igrant.data_wallet.tasks.OpenWalletTask
+import okhttp3.RequestBody
+import okhttp3.ResponseBody
+import org.greenrobot.eventbus.EventBus
+import org.hyperledger.indy.sdk.anoncreds.CredentialsSearchForProofReq
+import org.hyperledger.indy.sdk.non_secrets.WalletRecord
+import org.hyperledger.indy.sdk.pool.Pool
+import org.json.JSONArray
+import org.json.JSONObject
+import retrofit2.Call
+import retrofit2.Callback
+import retrofit2.Response
+
+
+class ExchangeDataActivity : BaseActivity() {
+
+    private var goToHome: Boolean = false
+    private var connection: MediatorConnectionObject? = null
+    private lateinit var mConnectionId: String
+    private var record: Record? = null
+
+    private var mPresentationExchange: PresentationExchange? = null
+
+    private lateinit var toolbar: Toolbar
+    private lateinit var tvDesc: TextView
+    private lateinit var tvHead: TextView
+
+    private lateinit var btAccept: Button
+    private lateinit var rvAttributes: RecyclerView
+    private lateinit var llProgressBar: LinearLayout
+
+    private lateinit var adapter: ExchangeRequestAttributeAdapter
+
+    private var attributelist: ArrayList<ExchangeAttributes> = ArrayList()
+
+    private var requestedAttributes: HashMap<String, CredentialValue> = HashMap()
+
+    private var isInsufficientData = false
+
+    companion object {
+        private const val TAG = "ExchangeDataActivity"
+        const val EXTRA_PRESENTATION_RECORD =
+            "io.igrant.mobileagent.activty.ExchangeDataActivity.record"
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_exchange_data)
+        initViews()
+        checkPool()
+        initListener()
+        getIntentData()
+        setUpToolbar()
+        initValues()
+    }
+
+    private fun checkPool() {
+        if (PoolManager.getPool == null) {
+            goToHome = true
+            llProgressBar.visibility = View.VISIBLE
+            initLibIndy()
+        }
+    }
+
+    private fun initLibIndy() {
+        LoadLibIndyTask(object : CommonHandler {
+            override fun taskCompleted() {
+                loadPool()
+            }
+
+            override fun taskStarted() {
+
+            }
+        }, applicationContext).execute()
+    }
+
+    private fun openWallet() {
+        OpenWalletTask(object : CommonHandler {
+            override fun taskCompleted() {
+                llProgressBar.visibility = View.GONE
+            }
+
+            override fun taskStarted() {
+
+            }
+        }).execute()
+    }
+
+    private fun loadPool() {
+        PoolTask(object : PoolHandler {
+            override fun taskCompleted(pool: Pool) {
+                PoolManager.setPool(pool)
+                openWallet()
+            }
+
+            override fun taskStarted() {
+
+            }
+        }, LedgerNetworkType.getSelectedNetwork(this)).execute()
+    }
+
+    private fun checkExistanceOfRecord() {
+        val searchResponse = SearchUtils.searchWallet(
+            WalletRecordType.MESSAGE_RECORDS,
+            "{\"certificateId\":\"${record?.id}\"}"
+        )
+        if (searchResponse.totalCount ?: 0 == 0) {
+            onBackPressed()
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        menuInflater.inflate(R.menu.menu_delete, menu)
+        return true
+    }
+
+    private fun initValues() {
+        if (connection != null) {
+            tvDesc.text =
+                resources.getString(
+                    R.string.txt_exchange_data_desc,
+                    connection?.theirLabel ?: resources.getString(R.string.txt_organisations)
+                )
+        }
+
+        tvHead.text = (mPresentationExchange?.presentationRequest?.name ?: "").toUpperCase()
+
+        val searchHandle = CredentialsSearchForProofReq.open(
+            WalletManager.getWallet,
+            WalletManager.getGson.toJson(mPresentationExchange?.presentationRequest),
+            "{}"
+        ).get()
+
+        requestedAttributes = HashMap()
+        attributelist.clear()
+        var credentialValue: CredentialValue
+        mPresentationExchange?.presentationRequest?.requestedAttributes?.forEach { (key, value) ->
+
+            val searchResult = searchHandle.fetchNextCredentials(key, 100).get()
+
+            if (JSONArray(searchResult).length() > 0) {
+                val referent =
+                    JSONObject(JSONArray(searchResult)[0].toString()).getJSONObject("cred_info")
+                        .getString("referent")
+
+                credentialValue = CredentialValue()
+                credentialValue.credId = referent
+                credentialValue.revealed = true
+
+                requestedAttributes[key] = credentialValue
+                if (value.name != null && value.name != "") {
+                    val data = try {
+
+                        JSONObject(JSONArray(searchResult)[0].toString()).getJSONObject("cred_info")
+                            .getJSONObject("attrs").getString(value.name ?: "")
+                    } catch (e: Exception) {
+                        ""
+                    }
+                    val attributes = ExchangeAttributes()
+                    attributes.name = value.name
+                    attributes.value = data
+                    attributes.credDefId =
+                        JSONObject(JSONArray(searchResult)[0].toString()).getJSONObject("cred_info")
+                            .getString("cred_def_id")
+                    attributes.referent =
+                        JSONObject(JSONArray(searchResult)[0].toString()).getJSONObject("cred_info")
+                            .getString("referent")
+
+                    attributelist.add(attributes)
+
+                } else {
+                    for (name in value.names ?: ArrayList()) {
+                        val data = try {
+                            JSONObject(JSONArray(searchResult)[0].toString()).getJSONObject("cred_info")
+                                .getJSONObject("attrs").getString(name)
+                        } catch (e: Exception) {
+                            ""
+                        }
+
+                        if (data != null && data != "") {
+                            val attributes = ExchangeAttributes()
+                            attributes.name = name
+                            attributes.value = data
+                            attributes.credDefId =
+                                JSONObject(JSONArray(searchResult)[0].toString()).getJSONObject("cred_info")
+                                    .getString("cred_def_id")
+                            attributes.referent =
+                                JSONObject(JSONArray(searchResult)[0].toString()).getJSONObject("cred_info")
+                                    .getString("referent")
+
+                            attributelist.add(attributes)
+                            break
+                        }
+                    }
+                }
+
+            } else {
+                isInsufficientData = true
+            }
+        }
+
+        searchHandle.closeSearch()
+
+        adapter = ExchangeRequestAttributeAdapter(
+            attributelist
+        )
+        rvAttributes.layoutManager = LinearLayoutManager(this)
+        rvAttributes.adapter = adapter
+    }
+
+    private fun getIntentData() {
+        record = intent.extras!!.get(EXTRA_PRESENTATION_RECORD) as Record
+        val notification = WalletManager.getGson.fromJson(record!!.value, Notification::class.java)
+        mPresentationExchange = notification.presentation
+        connection = notification.connection
+        mConnectionId = mPresentationExchange?.connectionId ?: ""
+        checkExistanceOfRecord()
+    }
+
+    private fun setUpToolbar() {
+        setSupportActionBar(toolbar)
+        supportActionBar!!.title = resources.getString(R.string.txt_data_agreement)
+        supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_arrow_back_black)
+        supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            android.R.id.home -> {
+                onBackPressed()
+            }
+            R.id.action_delete -> {
+                AlertDialog.Builder(this@ExchangeDataActivity)
+                    .setTitle(resources.getString(R.string.txt_confirmation))
+                    .setMessage(
+                        resources.getString(
+                            R.string.txt_exchange_request_delete_confirmation
+                        )
+                    ) // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton(
+                        android.R.string.ok,
+                        DialogInterface.OnClickListener { dialog, which ->
+                            WalletRecord.delete(
+                                WalletManager.getWallet,
+                                WalletRecordType.MESSAGE_RECORDS,
+                                mPresentationExchange?.threadId ?: ""
+                            ).get()
+
+                            val credentialExchangeResponse =
+                                SearchUtils.searchWallet(
+                                    WalletRecordType.CREDENTIAL_EXCHANGE_V10,
+                                    "{\"thread_id\": \"${mPresentationExchange?.threadId}\"}"
+                                )
+
+                            if (credentialExchangeResponse.totalCount ?: 0 > 0) {
+                                WalletRecord.delete(
+                                    WalletManager.getWallet,
+                                    WalletRecordType.CREDENTIAL_EXCHANGE_V10,
+                                    "${credentialExchangeResponse.records?.get(0)?.id}"
+                                ).get()
+                            }
+
+                            EventBus.getDefault()
+                                .post(ReceiveExchangeRequestEvent())
+
+                            onBackPressed()
+                        }) // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(
+                        android.R.string.cancel,
+                        DialogInterface.OnClickListener { dialog, which ->
+
+                        })
+                    .show()
+
+
+            }
+            else -> {
+
+            }
+        }
+        return super.onOptionsItemSelected(item)
+    }
+
+    private fun initViews() {
+        toolbar = findViewById(R.id.toolbar)
+        tvDesc = findViewById(R.id.tvDesc)
+        tvHead = findViewById(R.id.tvHead)
+        btAccept = findViewById(R.id.btAccept)
+//        btReject = findViewById(R.id.btReject)
+        rvAttributes = findViewById(R.id.rvAttributes)
+        llProgressBar = findViewById(R.id.llProgressBar)
+    }
+
+    private fun initListener() {
+//        btReject.setOnClickListener {
+//
+//        }
+
+        btAccept.setOnClickListener {
+            if (!isInsufficientData) {
+                llProgressBar.visibility = View.VISIBLE
+                btAccept.isEnabled = false
+//                btReject.isEnabled = false
+
+                ExchangeDataTask(object : CommonHandler {
+                    override fun taskStarted() {
+
+                    }
+
+                    override fun onExchangeDataComplete(
+                        serviceEndPoint: String?,
+                        typedBytes: RequestBody?
+                    ) {
+                        if (typedBytes != null) {
+                            ApiManager.api.getService()
+                                ?.postDataWithoutData(
+                                    serviceEndPoint ?: "",
+                                    typedBytes
+                                )
+                                ?.enqueue(object : Callback<ResponseBody> {
+                                    override fun onFailure(
+                                        call: Call<ResponseBody>,
+                                        t: Throwable
+                                    ) {
+                                        llProgressBar.visibility = View.GONE
+                                        btAccept.isEnabled = true
+//                                    btReject.isEnabled = true
+                                    }
+
+                                    override fun onResponse(
+                                        call: Call<ResponseBody>,
+                                        response: Response<ResponseBody>
+                                    ) {
+                                        if (response.code() == 200 && response.body() != null) {
+                                            llProgressBar.visibility = View.GONE
+                                            btAccept.isEnabled = true
+//                                        btReject.isEnabled = true
+
+                                            val tagJson = "{\n" +
+                                                    "  \"type\":\"${MessageTypes.TYPE_REQUEST_PRESENTATION}\",\n" +
+                                                    "  \"connectionId\":\"${mConnectionId}\",\n" +
+                                                    "  \"stat\":\"Processed\"\n" +
+                                                    "}"
+                                            WalletRecord.updateTags(
+                                                WalletManager.getWallet,
+                                                WalletRecordType.MESSAGE_RECORDS,
+                                                record?.id ?: "",
+                                                tagJson
+                                            )
+
+                                            EventBus.getDefault()
+                                                .post(ReceiveExchangeRequestEvent())
+
+                                            AlertDialog.Builder(this@ExchangeDataActivity)
+                                                .setMessage(
+                                                    resources.getString(
+                                                        R.string.txt_exchange_successful,
+                                                        connection?.theirLabel ?: ""
+                                                    )
+                                                ) // Specifying a listener allows you to take an action before dismissing the dialog.
+                                                // The dialog is automatically dismissed when a dialog button is clicked.
+                                                .setPositiveButton(
+                                                    android.R.string.ok,
+                                                    DialogInterface.OnClickListener { dialog, which ->
+                                                        onBackPressed()
+                                                    }) // A null listener allows the button to dismiss the dialog and take no further action.
+                                                .show()
+                                        }
+                                    }
+                                })
+                        } else {
+                            Toast.makeText(
+                                this@ExchangeDataActivity,
+                                resources.getString(R.string.err_ledger_missmatch),
+                                Toast.LENGTH_SHORT
+                            ).show()
+                            llProgressBar.visibility = View.GONE
+                            btAccept.isEnabled = true
+                        }
+                    }
+                }, mPresentationExchange, requestedAttributes).execute(record?.id, mConnectionId)
+            } else {
+                Toast.makeText(
+                    this,
+                    resources.getString(R.string.err_insufficient_data),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+        }
+    }
+
+    override fun onBackPressed() {
+        if (goToHome) {
+            val intent = Intent(this@ExchangeDataActivity, InitializeActivity::class.java)
+            startActivity(intent)
+        }
+        super.onBackPressed()
+    }
+}

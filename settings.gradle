@@ -1,0 +1,3 @@
+include ':data_wallet'
+include ':app'
+rootProject.name = "DataWallet"
