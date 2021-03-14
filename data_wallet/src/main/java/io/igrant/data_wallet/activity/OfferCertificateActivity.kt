@@ -455,7 +455,7 @@ class OfferCertificateActivity : BaseActivity() {
 
                 val certificateOffer = RequestOffer()
                 certificateOffer.type =
-                    "${DidCommPrefixUtils.getType()}/issue-credential/1.0/request-credential"
+                        "${DidCommPrefixUtils.getType(mCertificateOffer.type?:"")}/issue-credential/1.0/request-credential"
                 certificateOffer.id = UUID.randomUUID().toString()
                 certificateOffer.thread = thread
                 certificateOffer.offersAttach = requestAttachList
@@ -481,7 +481,8 @@ class OfferCertificateActivity : BaseActivity() {
 
                 val packedMessage = PackingUtils.packMessage(
                     didDoc, publicKey,
-                    WalletManager.getGson.toJson(certificateOffer)
+                        WalletManager.getGson.toJson(certificateOffer),
+                        mCertificateOffer.type?:""
                 )
 
                 typedBytes = object : RequestBody() {

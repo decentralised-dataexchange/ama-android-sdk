@@ -171,7 +171,7 @@ class ExchangeDataTask(
             )
 
             val data = "{\n" +
-                    "  \"@type\": \"${DidCommPrefixUtils.getType()}/present-proof/1.0/presentation\",\n" +
+                    "  \"@type\": \"${DidCommPrefixUtils.getType(mPresentationExchange?.type?:"")}/present-proof/1.0/presentation\",\n" +
                     "  \"@id\": \"${UUID.randomUUID()}\",\n" +
                     "  \"~thread\": {\n" +
                     "    \"thid\": \"${mPresentationExchange?.threadId}\"\n" +
@@ -187,6 +187,7 @@ class ExchangeDataTask(
                     "  ],\n" +
                     "  \"comment\": \"auto-presented for proof request nonce=1234567890\"\n" +
                     "}"
+
             val didDocObject =
                 SearchUtils.searchWallet(
                     WalletRecordType.DID_DOC,
@@ -204,7 +205,7 @@ class ExchangeDataTask(
                 didDoc.service?.get(0)?.serviceEndpoint ?: ""
 
             val packedMessage = PackingUtils.packMessage(didDoc,publicKey,
-                data)
+                    data,"")
 
             typedBytes = object : RequestBody() {
                 override fun contentType(): MediaType? {

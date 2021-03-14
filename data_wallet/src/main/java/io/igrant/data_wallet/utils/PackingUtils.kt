@@ -34,29 +34,29 @@ object PackingUtils {
         return packMessage(routingKey, senderKey, forwardMessage);
     }
 
-    fun packMessage(invitation: Invitation, senderKey: String, message: String): ByteArray {
+    fun packMessage(invitation: Invitation, senderKey: String, message: String,type:String): ByteArray {
 
         var primaryPacked =
-            packMessage("[\"${invitation.recipientKeys?.get(0) ?: ""}\"]", senderKey, message)
+                packMessage("[\"${invitation.recipientKeys?.get(0) ?: ""}\"]", senderKey, message)
 
         if (invitation.routingKeys != null && invitation.routingKeys?.size ?: 0 > 0) {
             for (s in invitation.routingKeys ?: ArrayList()) {
                 val primaryPackedString =
-                    String(primaryPacked, Charset.defaultCharset()).replace("\\u003d", "=")
+                        String(primaryPacked, Charset.defaultCharset()).replace("\\u003d", "=")
 
                 val forwardMessage: ForwardMessage = ForwardMessage()
-                forwardMessage.type = "${DidCommPrefixUtils.getType()}/routing/1.0/forward"
+                forwardMessage.type = "${DidCommPrefixUtils.getType(type)}/routing/1.0/forward"
                 forwardMessage.id = UUID.randomUUID().toString()
                 forwardMessage.to = invitation.recipientKeys?.get(0) ?: ""
                 forwardMessage.msg = WalletManager.getGson.fromJson(
-                    primaryPackedString.replace("\\u003d", "="),
-                    ConfigPostResponse::class.java
+                        primaryPackedString.replace("\\u003d", "="),
+                        ConfigPostResponse::class.java
                 )
 
                 primaryPacked = packMessage(
-                    "[\"$s\"]",
-                    senderKey,
-                    WalletManager.getGson.toJson(forwardMessage)
+                        "[\"$s\"]",
+                        senderKey,
+                        WalletManager.getGson.toJson(forwardMessage)
                 )
             }
             return primaryPacked
@@ -65,34 +65,34 @@ object PackingUtils {
         }
     }
 
-    fun packMessage(didDoc: DidDoc, senderKey: String, message: String): ByteArray {
+    fun packMessage(didDoc: DidDoc, senderKey: String, message: String,type:String): ByteArray {
 
         if (didDoc.service!![0].recipientKeys != null && didDoc.service!![0].recipientKeys?.size ?: 0 > 0) {
             var primaryPacked =
-                packMessage(
-                    "[\"${didDoc.service!![0].recipientKeys!![0]}\"]",
-                    senderKey,
-                    message
-                )
+                    packMessage(
+                            "[\"${didDoc.service!![0].recipientKeys!![0]}\"]",
+                            senderKey,
+                            message
+                    )
 
             if (didDoc.service!![0].routingKeys != null && didDoc.service!![0].routingKeys?.size ?: 0 > 0) {
 
                 for (s in didDoc.service!![0].routingKeys ?: ArrayList()) {
                     val primaryPackedString =
-                        String(primaryPacked, Charset.defaultCharset()).replace("\\u003d", "=")
+                            String(primaryPacked, Charset.defaultCharset()).replace("\\u003d", "=")
 
                     val forwardMessage: ForwardMessage = ForwardMessage()
-                    forwardMessage.type = "${DidCommPrefixUtils.getType()}/routing/1.0/forward"
+                    forwardMessage.type = "${DidCommPrefixUtils.getType(type)}/routing/1.0/forward"
                     forwardMessage.id = UUID.randomUUID().toString()
                     forwardMessage.to = didDoc.service!![0].recipientKeys?.get(0) ?: ""
                     forwardMessage.msg = WalletManager.getGson.fromJson(
-                        primaryPackedString.replace("\\u003d", "="),
-                        ConfigPostResponse::class.java
+                            primaryPackedString.replace("\\u003d", "="),
+                            ConfigPostResponse::class.java
                     )
                     primaryPacked = packMessage(
-                        "[\"$s\"]",
-                        senderKey,
-                        WalletManager.getGson.toJson(forwardMessage)
+                            "[\"$s\"]",
+                            senderKey,
+                            WalletManager.getGson.toJson(forwardMessage)
                     )
                 }
 

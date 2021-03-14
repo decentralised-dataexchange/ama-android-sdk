@@ -9,6 +9,7 @@ import io.igrant.data_wallet.models.MediatorConnectionObject
 import io.igrant.data_wallet.models.connectionRequest.DidDoc
 import io.igrant.data_wallet.models.tagJsons.UpdateInvitationKey
 import io.igrant.data_wallet.utils.ConnectionStates
+import io.igrant.data_wallet.utils.DidCommPrefixUtils
 import io.igrant.data_wallet.utils.PackingUtils
 import io.igrant.data_wallet.utils.SearchUtils
 import io.igrant.data_wallet.utils.WalletRecordType.Companion.CONNECTION
@@ -144,13 +145,13 @@ class SaveDidDocTask(
             )
 
             val trustPingData = "{\n" +
-                    "  \"@type\": \"https://didcomm.org/trust_ping/1.0/ping\",\n" +
+                    "  \"@type\": \"${DidCommPrefixUtils.getType(didDoc.service?.get(0)?.type?:"")}/trust_ping/1.0/ping\",\n" +
                     "  \"@id\": \"${UUID.randomUUID()}\",\n" +
                     "  \"comment\": \"ping\",\n" +
                     "  \"response_requested\": true\n" +
                     "}\n"
 
-            val packedMessage = PackingUtils.packMessage(didDoc,publicKey2,trustPingData)
+            val packedMessage = PackingUtils.packMessage(didDoc,publicKey2,trustPingData,didDoc.service?.get(0)?.type?:"")
 
             Log.d(TAG, "packed message: ${String(packedMessage)}")
 

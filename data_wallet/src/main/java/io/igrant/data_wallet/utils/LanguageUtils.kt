@@ -9,10 +9,12 @@ object LanguageUtils {
     const val LANG_ENGLISH = "en"
     const val LANG_SWEDISH = "sv"
     const val LANG_DANISH = "da"
+    const val LANG_FINNISH = "fi"
     const val LANG_PORTUGUESE = "pt"
     private const val LANG_ENGLISH_STRING = "English"
     private const val LANG_SWIDISH_STRING = "Svenska"
-    private const val LANG_DANISH_STRING = "dansk"
+    private const val LANG_DANISH_STRING = "Dansk"
+    private const val LANG_FINNISH_STRING = "Suomi"
     private const val LANG_PORTUGUESE_STRING = "Português"
     private const val KEY_USER_LANGUAGE = "key_user_app_language"
 
@@ -22,7 +24,7 @@ object LanguageUtils {
 
         val languages: ArrayList<Language> = ArrayList<Language>()
         var language = Language()
-        language.language = LANG_ENGLISH_STRING
+        language.language =LANG_ENGLISH_STRING
         language.languageCode = LANG_ENGLISH
         language.isChecked = lang == LANG_ENGLISH
         languages.add(language)
@@ -39,20 +41,29 @@ object LanguageUtils {
         language.isChecked = lang == LANG_DANISH
         languages.add(language)
 
+        language = Language()
+        language.language = LANG_FINNISH_STRING
+        language.languageCode = LANG_FINNISH
+        language.isChecked = lang == LANG_FINNISH
+        languages.add(language)
+
         return languages
     }
 
     fun getLanguage(code:String): String {
 
         when(code){
-            LANG_ENGLISH ->{
+            LANG_ENGLISH->{
                 return LANG_ENGLISH_STRING
             }
-            LANG_SWEDISH ->{
+            LANG_SWEDISH->{
                 return LANG_SWIDISH_STRING
             }
-            LANG_SWEDISH ->{
+            LANG_SWEDISH->{
                 return LANG_DANISH_STRING
+            }
+            LANG_FINNISH->{
+                return LANG_FINNISH_STRING
             }
             else->{
                 return LANG_ENGLISH_STRING

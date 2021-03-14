@@ -76,13 +76,15 @@
         <ImageView
             android:layout_width="50dp"
             android:layout_height="50dp"
-            android:src="@drawable/ic_no_data" />
+            android:src="@drawable/ic_no_data"
+            android:contentDescription="@string/txt_no_data_available_in_home"/>
 
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:padding="10dp"
-            android:text="@string/txt_no_data_avaialable"
+            android:textAlignment="center"
+            android:text="@string/txt_no_data_available_in_home"
             android:textColor="@color/textColor"
             android:textSize="@dimen/text_size_normal" />
 
@@ -121,6 +123,7 @@
         android:paddingEnd="20dp"
         android:text="@string/txt_exchange_data"
         android:textColor="@color/white"
+        android:textAllCaps="false"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent" />
