@@ -6,7 +6,7 @@ plugins {
 apply plugin: 'com.github.dcendents.android-maven'
 
 group='com.github.decentralised-dataexchange'
-version = '1.1.1'
+version = '1.1.2'
 
 android {
     compileSdkVersion 30
@@ -16,7 +16,7 @@ android {
         minSdkVersion 21
         targetSdkVersion 30
         versionCode 2
-        versionName "1.1.1"
+        versionName "1.1.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -73,4 +73,106 @@ dependencies {
     implementation 'com.github.koushikcse:LoadingButton:1.7'
 
     implementation 'com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.3'
+}
+
+install {
+    repositories.mavenInstaller {
+        pom.project {
+
+            name 'ama-android-sdk'
+
+            dependencies {
+                dependency {
+                    groupId 'androidx.core'
+                    artifactId 'core-ktx'
+                    version '1.3.2'
+                }
+                dependency {
+                    groupId 'androidx.appcompat'
+                    artifactId 'appcompat'
+                    version '1.2.0'
+                }
+                dependency {
+                    groupId 'com.google.android.material'
+                    artifactId 'material'
+                    version '1.3.0'
+                }
+                dependency {
+                    groupId 'org.hyperledger'
+                    artifactId 'indy'
+                    version '1.15.0'
+                }
+                dependency {
+                    groupId 'net.java.dev.jna'
+                    artifactId 'jna'
+                    version '4.5.1'
+                }
+                dependency {
+                    groupId 'org.apache.commons'
+                    artifactId 'commons-lang3'
+                    version '3.7'
+                }
+                dependency {
+                    groupId 'commons-io'
+                    artifactId 'commons-io'
+                    version '2.6'
+                }
+                dependency {
+                    groupId 'com.squareup.retrofit2'
+                    artifactId 'retrofit'
+                    version '2.7.1'
+                }
+                dependency {
+                    groupId 'com.squareup.retrofit2'
+                    artifactId 'converter-gson'
+                    version '2.7.1'
+                }
+                dependency {
+                    groupId 'com.squareup.okhttp3'
+                    artifactId 'okhttp'
+                    version '4.3.1'
+                }
+                dependency {
+                    groupId 'com.squareup.okhttp3'
+                    artifactId 'logging-interceptor'
+                    version '4.3.1'
+                }
+                dependency {
+                    groupId 'com.google.code.gson'
+                    artifactId 'gson'
+                    version '2.6.8'
+                }
+                dependency {
+                    groupId 'com.github.bumptech.glide'
+                    artifactId 'glide'
+                    version '4.11.0'
+                }
+                dependency {
+                    groupId 'com.github.bumptech.glide'
+                    artifactId 'compiler'
+                    version '4.11.0'
+                }
+                dependency {
+                    groupId 'com.airbnb.android'
+                    artifactId 'lottie'
+                    version '3.5.0'
+                }
+                dependency {
+                    groupId 'org.greenrobot'
+                    artifactId 'eventbus'
+                    version '3.1.1'
+                }
+                dependency {
+                    groupId 'com.github.koushikcse'
+                    artifactId 'LoadingButton'
+                    version '1.7'
+                }
+                dependency {
+                    groupId 'com.dlazaro66.qrcodereaderview'
+                    artifactId 'qrcodereaderview'
+                    version '2.0.3'
+                }
+            }
+        }
+    }
 }

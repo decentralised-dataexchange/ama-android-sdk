@@ -14,4 +14,5 @@
 
     <color name="mask_color">#55000000</color>
     <color name="red">#f00</color>
+    <color name="Black">#000</color>
 </resources>
