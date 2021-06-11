@@ -34,6 +34,8 @@ import io.igrant.data_wallet.qrcode.QrCodeActivity
 import io.igrant.data_wallet.utils.PermissionUtils
 import io.igrant.data_wallet.utils.WalletRecordType
 import io.igrant.data_wallet.dailogFragments.ConnectionProgressDailogFragment
+import io.igrant.data_wallet.utils.ExtractUrlListeners
+import io.igrant.data_wallet.utils.ExtractUrlUtil
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
@@ -110,85 +112,35 @@ class ConnectionListActivity : BaseActivity(),
             } catch (e: Exception) {
                 Uri.parse("igrant.io")
             }
-            val v: String = uri.getQueryParameter("c_i") ?: ""
-            if (v != "") {
-                saveConnection(v)
-            } else {
+            ExtractUrlUtil.extractUrl(uri, object : ExtractUrlListeners {
+                override fun onSuccessFullyExecutedConnectionRequest(
+                    invitation: Invitation,
+                    proposal: String
+                ) {
+                    Handler(Looper.getMainLooper()).postDelayed({
+                        val connectionSuccessDialogFragment: ConnectionProgressDailogFragment =
+                            ConnectionProgressDailogFragment.newInstance(
+                                false,
+                                invitation,
+                                proposal
+                            )
+                        connectionSuccessDialogFragment.show(
+                            supportFragmentManager,
+                            "fragment_edit_name"
+                        )
+                    }, 200)
+                }
 
-                ApiManager.api.getService()?.extractUrl(uri.toString())?.enqueue(object :
-                    Callback<QrDecode> {
-                    override fun onFailure(call: Call<QrDecode>, t: Throwable) {
-                        Toast.makeText(
-                            this@ConnectionListActivity,
-                            resources.getString(R.string.err_unexpected),
-                            Toast.LENGTH_SHORT
-                        ).show()
-                    }
-
-                    override fun onResponse(call: Call<QrDecode>, response: Response<QrDecode>) {
-                        if (response.code() == 200 && response.body() != null) {
-                            if (response.body()!!.invitationUrl != null) {
-                                val uri: Uri = try {
-                                    Uri.parse(response.body()!!.invitationUrl)
-                                } catch (e: Exception) {
-                                    Uri.parse("igrant.io")
-                                }
-                                val v: String = uri.getQueryParameter("c_i") ?: ""
-                                if (v != "") {
-                                    saveConnection(v)
-                                } else {
-                                    Toast.makeText(
-                                        this@ConnectionListActivity,
-                                        resources.getString(R.string.err_unexpected),
-                                        Toast.LENGTH_SHORT
-                                    ).show()
-                                }
-                            }
-                        }
-                    }
-                })
-            }
+                override fun onFailureRequest() {
+                    Toast.makeText(
+                        this@ConnectionListActivity,
+                        resources.getString(R.string.err_unexpected),
+                        Toast.LENGTH_SHORT
+                    ).show()
+                }
+            })
         }
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    private fun saveConnection(data: String) {
-        var invitation: Invitation? = null
-        try {
-            val json =
-                Base64.decode(
-                    data,
-                    Base64.URL_SAFE
-                ).toString(charset("UTF-8"))
-            invitation = WalletManager.getGson.fromJson(json, Invitation::class.java)
-        } catch (e: Exception) {
-        }
-
-        if (invitation != null) {
-//            if (ConnectionUtils.checkIfConnectionAvailable(invitation.recipientKeys!![0])) {
-//                Toast.makeText(
-//                    this,
-//                    resources.getString(R.string.err_connection_already_added),
-//                    Toast.LENGTH_SHORT
-//                ).show()
-//            } else {
-                Handler(Looper.getMainLooper()).postDelayed({
-                    val connectionSuccessDialogFragment: ConnectionProgressDailogFragment =
-                        ConnectionProgressDailogFragment.newInstance(
-                            false,
-                            invitation,
-                            ""
-                        )
-                    connectionSuccessDialogFragment.show(
-                        supportFragmentManager,
-                        "fragment_edit_name"
-                    )
-                }, 200)
-//            }
-        } else {
-            Toast.makeText(this, resources.getString(R.string.err_unexpected), Toast.LENGTH_SHORT)
-                .show()
-        }
     }
 
     private fun getConnectionList() {

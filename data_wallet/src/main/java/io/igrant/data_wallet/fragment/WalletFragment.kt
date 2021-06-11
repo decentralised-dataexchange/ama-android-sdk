@@ -31,6 +31,9 @@ import io.igrant.data_wallet.models.qr.QrDecode
 import io.igrant.data_wallet.models.wallet.WalletModel
 import io.igrant.data_wallet.models.walletSearch.Record
 import io.igrant.data_wallet.qrcode.QrCodeActivity
+import io.igrant.data_wallet.utils.ConnectionUtils.saveConnectionAndExchangeData
+import io.igrant.data_wallet.utils.ExtractUrlListeners
+import io.igrant.data_wallet.utils.ExtractUrlUtil
 import io.igrant.data_wallet.utils.PermissionUtils
 import io.igrant.data_wallet.utils.SearchUtils
 import io.igrant.data_wallet.utils.WalletRecordType.Companion.WALLET
@@ -201,103 +204,26 @@ class WalletFragment : BaseFragment() {
                     Uri.parse("igrant.io")
                 }
 
-                val v: String = uri.getQueryParameter("qr_p") ?: ""
-                if (v != "") {
-                    val json =
-                        Base64.decode(
-                            v,
-                            Base64.URL_SAFE
-                        ).toString(charset("UTF-8"))
-                    val data = JSONObject(json)
-                    if (data.getString("invitation_url") != "") {
-                        val invitation: String =
-                            Uri.parse(data.getString("invitation_url")).getQueryParameter("c_i")
-                                ?: ""
-                        val proofRequest = data.getJSONObject("proof_request")
-                        saveConnectionAndExchangeData(invitation, proofRequest, "")
-                    } else {
+                llProgressBar.visibility=View.VISIBLE
+                ExtractUrlUtil.extractUrl(uri,object : ExtractUrlListeners {
+                    override fun onFailureRequest() {
+                        llProgressBar.visibility=View.GONE
                         Toast.makeText(
                             context,
                             resources.getString(R.string.err_unexpected),
                             Toast.LENGTH_SHORT
                         ).show()
                     }
-                } else {
 
-                    val bits: List<String> = uri.toString().split("/")
-
-                    val lastOne = bits[bits.size - 1]
-
-                    llProgressBar.visibility = View.VISIBLE
-
-                    ApiManager.api.getService()?.extractUrl(uri.toString())?.enqueue(object :
-                        Callback<QrDecode> {
-                        override fun onFailure(call: Call<QrDecode>, t: Throwable) {
-                            llProgressBar.visibility = View.GONE
-                            Toast.makeText(
-                                context,
-                                resources.getString(R.string.err_unexpected),
-                                Toast.LENGTH_SHORT
-                            ).show()
-                        }
-
-                        override fun onResponse(
-                            call: Call<QrDecode>,
-                            response: Response<QrDecode>
-                        ) {
-                            llProgressBar.visibility = View.GONE
-                            if (response.code() == 200 && response.body() != null) {
-                                if (response.body()!!.dataExchangeUrl != null) {
-                                    //split with / and take the last element - to get qr_id
-                                    val uri: Uri = try {
-                                        Uri.parse(response.body()!!.dataExchangeUrl)
-                                    } catch (e: Exception) {
-                                        Uri.parse("igrant.io")
-                                    }
-                                    val v: String = uri.getQueryParameter("qr_p") ?: ""
-                                    if (v != "") {
-                                        val json =
-                                            Base64.decode(
-                                                v,
-                                                Base64.URL_SAFE
-                                            ).toString(charset("UTF-8"))
-                                        val data = JSONObject(json)
-                                        if (data.getString("invitation_url") != "") {
-                                            val invitation: String =
-                                                Uri.parse(data.getString("invitation_url"))
-                                                    .getQueryParameter("c_i")
-                                                    ?: ""
-                                            val proofRequest = data.getJSONObject("proof_request")
-                                            saveConnectionAndExchangeData(
-                                                    invitation,
-                                                    proofRequest,
-                                                    lastOne
-                                            )
-                                        } else {
-                                            Toast.makeText(
-                                                context,
-                                                resources.getString(R.string.err_unexpected),
-                                                Toast.LENGTH_SHORT
-                                            ).show()
-                                        }
-                                    } else {
-                                        Toast.makeText(
-                                            context,
-                                            resources.getString(R.string.err_unexpected),
-                                            Toast.LENGTH_SHORT
-                                        ).show()
-                                    }
-                                }
-                            }
-                        }
-                    })
-
-//                    Toast.makeText(
-//                        context,
-//                        resources.getString(R.string.err_unexpected),
-//                        Toast.LENGTH_SHORT
-//                    ).show()
-                }
+                    override fun onSuccessFullyExecutedExchangeRequest(
+                        data: String,
+                        proofRequest: JSONObject,
+                        qrId: String
+                    ) {
+                        llProgressBar.visibility=View.GONE
+                        saveConnectionAndExchangeData(requireContext(),data,proofRequest,qrId)
+                    }
+                })
             } catch (e: Exception) {
                 Toast.makeText(
                     context,
@@ -307,44 +233,6 @@ class WalletFragment : BaseFragment() {
             }
         }
         super.onActivityResult(requestCode, resultCode, data)
-    }
-
-    private fun saveConnectionAndExchangeData(
-        data: String,
-        proofRequest: JSONObject,
-        qrId: String
-    ) {
-        var invitation: Invitation? = null
-        try {
-            val json =
-                Base64.decode(
-                    data,
-                    Base64.URL_SAFE
-                ).toString(charset("UTF-8"))
-
-            invitation = WalletManager.getGson.fromJson(json, Invitation::class.java)
-        } catch (e: Exception) {
-        }
-        if (invitation != null)
-            sendProposal(proofRequest, invitation, qrId)
-        else
-            Toast.makeText(
-                context,
-                resources.getString(R.string.err_unexpected),
-                Toast.LENGTH_SHORT
-            ).show()
-    }
-
-    private fun sendProposal(
-        proofRequest: JSONObject,
-        invitation: Invitation,
-        qrId: String
-    ) {
-        val intent = Intent(requireContext(), ProposeAndExchangeDataActivity::class.java)
-        intent.putExtra(EXTRA_PRESENTATION_PROPOSAL, proofRequest.toString())
-        intent.putExtra(EXTRA_PRESENTATION_INVITATION, invitation)
-        intent.putExtra(EXTRA_PRESENTATION_QR_ID, qrId)
-        startActivity(intent)
     }
 
     private fun filterList(s: CharSequence?) {

@@ -1,7 +1,10 @@
 package io.igrant.data_wallet.activity
 
 import android.content.Intent
+import android.net.Uri
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Base64
 import android.util.Log
 import android.view.MenuItem
@@ -15,6 +18,7 @@ import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.igrant.data_wallet.R
 import io.igrant.data_wallet.communication.ApiManager
+import io.igrant.data_wallet.dailogFragments.ConnectionProgressDailogFragment
 import io.igrant.data_wallet.events.ConnectionSuccessEvent
 import io.igrant.data_wallet.events.ReceiveCertificateEvent
 import io.igrant.data_wallet.events.ReceiveExchangeRequestEvent
@@ -148,6 +152,7 @@ class InitializeActivity : BaseActivity(), InitialActivityFunctions {
             initLibIndy()
         } else {
             getMediatorConfig()
+            getFirebaseDynamicLink()
         }
     }
 
@@ -173,12 +178,76 @@ class InitializeActivity : BaseActivity(), InitialActivityFunctions {
             override fun taskCompleted() {
                 getMediatorConfig()
                 tvLoadingStatus.text = resources.getString(R.string.txt_finishing)
+                getFirebaseDynamicLink()
             }
 
             override fun taskStarted() {
 
             }
         }).execute()
+    }
+
+    private fun getFirebaseDynamicLink() {
+        Firebase.dynamicLinks
+            .getDynamicLink(intent)
+            .addOnSuccessListener(this) { pendingDynamicLinkData ->
+                // Get deep link from result (may be null if no link is found)
+                var deepLink: Uri? = null
+                if (pendingDynamicLinkData != null) {
+                    deepLink = pendingDynamicLinkData.link
+
+                    try {
+                        val uri: Uri = deepLink?: Uri.parse("igrant.io")
+
+
+                        llProgressBar.visibility=View.VISIBLE
+                        ExtractUrlUtil.extractUrl(uri,object : ExtractUrlListeners{
+                            override fun onFailureRequest() {
+                                llProgressBar.visibility=View.GONE
+                                Toast.makeText(
+                                    this@InitializeActivity,
+                                    resources.getString(R.string.err_unexpected),
+                                    Toast.LENGTH_SHORT
+                                ).show()
+                            }
+
+                            override fun onSuccessFullyExecutedExchangeRequest(
+                                data: String,
+                                proofRequest: JSONObject,
+                                qrId: String
+                            ) {
+                                llProgressBar.visibility=View.GONE
+                                ConnectionUtils.saveConnectionAndExchangeData(this@InitializeActivity,data,proofRequest,qrId)
+                            }
+
+                            override fun onSuccessFullyExecutedConnectionRequest(
+                                invitation: Invitation,
+                                proposal: String
+                            ) {
+                                Handler(Looper.getMainLooper()).postDelayed({
+                                    val connectionSuccessDialogFragment: ConnectionProgressDailogFragment =
+                                        ConnectionProgressDailogFragment.newInstance(
+                                            false,
+                                            invitation,
+                                            proposal
+                                        )
+                                    connectionSuccessDialogFragment.show(
+                                        supportFragmentManager,
+                                        "fragment_edit_name"
+                                    )
+                                }, 200)
+                            }
+                        })
+                    } catch (e: Exception) {
+                        Toast.makeText(
+                            this,
+                            resources.getString(R.string.err_unexpected),
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
+                }
+            }
+            .addOnFailureListener(this) { e -> Log.w(TAG, "getDynamicLink:onFailure", e) }
     }
 
     private fun loadPool() {
@@ -1748,7 +1817,7 @@ class InitializeActivity : BaseActivity(), InitialActivityFunctions {
         service.priority = 0
         service.recipientKeys = recipientsKey
         service.routingKeys = routis
-        service.serviceEndpoint = "https://mediator.igrant.io"
+        service.serviceEndpoint = ApiManager.API_URL
 
         val services: ArrayList<Service> = ArrayList()
         services.add(service)

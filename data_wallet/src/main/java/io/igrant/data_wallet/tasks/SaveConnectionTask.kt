@@ -1,6 +1,7 @@
 package io.igrant.data_wallet.tasks
 
 import android.os.AsyncTask
+import io.igrant.data_wallet.communication.ApiManager
 import io.igrant.data_wallet.handlers.CommonHandler
 import io.igrant.data_wallet.indy.WalletManager
 import io.igrant.data_wallet.models.MediatorConnectionObject
@@ -172,7 +173,7 @@ class SaveConnectionTask(
         service.priority = 0
         service.recipientKeys = recipientsKey
         service.routingKeys = routis
-        service.serviceEndpoint = "https://mediator.igrant.io"
+        service.serviceEndpoint = ApiManager.API_URL
 
         val services: ArrayList<Service> = ArrayList()
         services.add(service)

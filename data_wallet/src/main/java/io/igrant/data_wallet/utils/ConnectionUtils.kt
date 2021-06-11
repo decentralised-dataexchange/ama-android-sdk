@@ -1,10 +1,16 @@
 package io.igrant.data_wallet.utils
 
+import android.content.Context
+import android.content.Intent
+import android.util.Base64
 import com.google.gson.Gson
+import io.igrant.data_wallet.activity.ProposeAndExchangeDataActivity
 import io.igrant.data_wallet.indy.WalletManager
 import io.igrant.data_wallet.models.MediatorConnectionObject
+import io.igrant.data_wallet.models.agentConfig.Invitation
 import io.igrant.data_wallet.models.walletSearch.SearchResponse
 import org.hyperledger.indy.sdk.non_secrets.WalletSearch
+import org.json.JSONObject
 
 object ConnectionUtils {
 
@@ -76,5 +82,45 @@ object ConnectionUtils {
             )
         else
             null
+    }
+
+    fun saveConnectionAndExchangeData(
+        context: Context,
+        data: String,
+        proofRequest: JSONObject,
+        qrId: String
+    ) {
+        var invitation: Invitation? = null
+        try {
+            val json =
+                Base64.decode(
+                    data,
+                    Base64.URL_SAFE
+                ).toString(charset("UTF-8"))
+
+            invitation = WalletManager.getGson.fromJson(json, Invitation::class.java)
+        } catch (e: Exception) {
+        }
+        if (invitation != null)
+            sendProposal(context,proofRequest, invitation, qrId)
+//        else
+//            Toast.makeText(
+//                context,
+//                resources.getString(R.string.err_unexpected),
+//                Toast.LENGTH_SHORT
+//            ).show()
+    }
+
+    private fun sendProposal(
+        context: Context,
+        proofRequest: JSONObject,
+        invitation: Invitation,
+        qrId: String
+    ) {
+        val intent = Intent(context, ProposeAndExchangeDataActivity::class.java)
+        intent.putExtra(ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_PROPOSAL, proofRequest.toString())
+        intent.putExtra(ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_INVITATION, invitation)
+        intent.putExtra(ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_QR_ID, qrId)
+        context.startActivity(intent)
     }
 }

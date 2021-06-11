@@ -16,7 +16,7 @@ interface APIService {
     @GET(".well-known/agent-configuration")
     fun getAgentConfig(): Call<ConfigResponse>
 
-    @POST(".well-known/agent-configuration")
+    @POST(" ")
     fun postDetails(@Body bytes:RequestBody ): Call<ResponseBody>
 
     @POST(" ")
