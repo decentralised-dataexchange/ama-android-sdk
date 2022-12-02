@@ -7,7 +7,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.google.gms.google-services'
 
 group='com.github.decentralised-dataexchange'
-version = '1.1.2'
+version = '1.12.1'
 
 android {
     compileSdkVersion 32
@@ -16,8 +16,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 32
-        versionCode 2
-        versionName "1.1.2"
+        versionCode 3
+        versionName "1.12.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -72,8 +72,6 @@ dependencies {
 
     implementation 'com.github.koushikcse:LoadingButton:1.7'
 
-    implementation 'com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.3'
-
     implementation 'com.github.mediapark-pk:Base58-android:0.1'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
     implementation 'com.tbuonomo:dotsindicator:4.2'
@@ -109,12 +107,12 @@ install {
                 dependency {
                     groupId 'org.hyperledger'
                     artifactId 'indy'
-                    version '1.15.0'
+                    version '1.16.0'
                 }
                 dependency {
                     groupId 'net.java.dev.jna'
                     artifactId 'jna'
-                    version '4.5.1'
+                    version '5.6.0'
                 }
                 dependency {
                     groupId 'org.apache.commons'
@@ -124,7 +122,7 @@ install {
                 dependency {
                     groupId 'commons-io'
                     artifactId 'commons-io'
-                    version '2.6'
+                    version '2.8.0'
                 }
                 dependency {
                     groupId 'com.squareup.retrofit2'
@@ -149,7 +147,7 @@ install {
                 dependency {
                     groupId 'com.google.code.gson'
                     artifactId 'gson'
-                    version '2.6.8'
+                    version '2.8.6'
                 }
                 dependency {
                     groupId 'com.github.bumptech.glide'
@@ -177,9 +175,33 @@ install {
                     version '1.7'
                 }
                 dependency {
-                    groupId 'com.dlazaro66.qrcodereaderview'
-                    artifactId 'qrcodereaderview'
-                    version '2.0.3'
+                    groupId 'com.github.mediapark-pk'
+                    artifactId 'Base58-android'
+                    version '0.1'
+                }
+                dependency {
+                    groupId 'org.jetbrains.kotlinx'
+                    artifactId 'kotlinx-coroutines-android'
+                    version '1.5.2'
+                }
+                dependency {
+                    groupId 'com.tbuonomo'
+                    artifactId 'dotsindicator'
+                    version '4.2'
+                }
+                dependency {
+                    groupId 'com.github.L3-iGrant'
+                    artifactId 'qrcode_scanner_android'
+                    version '2.7.1'
+                }
+                dependency {
+                    groupId 'com.google.firebase'
+                    artifactId 'firebase-bom'
+                    version '28.0.1'
+                }
+                dependency {
+                    groupId 'com.google.firebase'
+                    artifactId 'firebase-dynamic-links-ktx'
                 }
             }
         }
