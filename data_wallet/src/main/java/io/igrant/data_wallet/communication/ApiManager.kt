@@ -14,7 +14,9 @@ object ApiManager {
         return service
     }
 
-    private const val API_URL = "https://mediator.igrant.io/"
+    //this should be changed only when mediator changes
+    //this has dependency in other classes, check its usage before changing
+    const val API_URL = "https://mediator.igrant.io/"
 
     private var okClient: OkHttpClient? = null
     private var service: APIService? = null

@@ -12,4 +12,10 @@
     <dimen name="mar_start">20dp</dimen>
     <dimen name="mar_between_views_vertical">10dp</dimen>
     <dimen name="pad_connection_progress">60dp</dimen>
+    <dimen name="forward_arrow_width">30dp</dimen>
+    <dimen name="forward_arrow_height">30dp</dimen>
+    <dimen name="forward_arrow_padding">8dp</dimen>
+    <dimen name="home_menu_icon_padding">8dp</dimen>
+
+    <dimen name="button_height">40dp</dimen>
 </resources>

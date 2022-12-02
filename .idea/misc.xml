@@ -5,6 +5,67 @@
       <configuration PROFILE_NAME="Debug" CONFIG_NAME="Debug" />
     </configurations>
   </component>
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/app/src/main/res/layout/activity_main.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable-v24/bg_gradient.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable-v24/search_bg.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/circle_image_eye.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/ic_credit_card_24.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/ic_id_card.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/ic_info.xml" value="0.1095" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/ic_invisible_bg.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/ic_secured_lock_24.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/ic_visible_bg.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/list_divider.xml" value="0.1095" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/list_divider_layer.xml" value="0.1095" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/primary_edittext_background_no_border.xml" value="0.1095" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/switch_ios_selection.xml" value="0.1095" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/wallet_alternate_card_bg.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/wallet_alternate_card_bg_end.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/wallet_card_bg.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/wallet_card_bg_end.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/drawable/wallet_card_bg_white.xml" value="0.1345" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_certificate_detail.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_connection_detail.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_connection_list.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_data_agreement_policy.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_exchange_data.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_history.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_history_detail.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_initialize.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_offer_certificate.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_request.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_third_party_data_sharing.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/dailog_fragment_connection_progress.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/fragment_data_agreement_policy.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/fragment_filter_bottom_sheet.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/fragment_propose_and_exchange_list.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/fragment_wallet.xml" value="0.2" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_certificate.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_certificate_attribute.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_connection.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_connection_filter.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_history.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_notification.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_proof.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_section.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_third_party_data_sharing.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_third_party_data_sharing_companies.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_vaccination.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/toast.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/menu/menu_blur.xml" value="0.23802083333333332" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/menu/menu_delete.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/menu/menu_filter.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/menu/menu_home.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/menu/menu_main.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/menu/menu_settings.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/menu/menu_third_party_data_sharing.xml" value="0.1" />
+      </map>
+    </option>
+  </component>
+  <component name="ExternalStorageConfigurationManager" enabled="true" />
   <component name="ProjectRootManager" version="2" languageLevel="JDK_1_8" default="true" project-jdk-name="1.8" project-jdk-type="JavaSDK">
     <output url="file://$PROJECT_DIR$/build/classes" />
   </component>

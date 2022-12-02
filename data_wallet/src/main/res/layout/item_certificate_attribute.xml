@@ -4,42 +4,79 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingStart="10dp"
-    android:paddingEnd="10dp"
-    android:paddingTop="10dp">
+    android:paddingTop="10dp"
+    android:paddingEnd="10dp">
 
     <TextView
         android:id="@+id/tvAttributeName"
-        android:layout_width="0dp"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="10dp"
         android:textAlignment="viewStart"
         android:textColor="@color/Black"
         android:textSize="@dimen/text_size_medium"
-        app:layout_constraintEnd_toStartOf="@+id/tvAttributeValue"
+        app:layout_constraintBottom_toTopOf="@+id/tvAttributeValue1"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="10dp"/>
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
         android:id="@+id/tvAttributeValue"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:autoLink="web"
+        android:lines="1"
+        android:singleLine="true"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/textColorLight"
+        android:textColorLink="#0000EE"
+        android:textIsSelectable="true"
+        android:textSize="@dimen/text_size_medium"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="@+id/tvAttributeName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/tvAttributeName" />
+
+    <ImageView
+        android:id="@+id/ivAttributeValue"
+        android:layout_width="0dp"
+        android:layout_height="100dp"
+        android:layout_marginBottom="10dp"
+        android:src="@drawable/ic_id_card"
+        android:textAlignment="viewEnd"
+        android:textColor="@color/textColorLight"
+        android:textSize="@dimen/text_size_medium"
+        android:visibility="gone"
+        app:flow_horizontalAlign="end"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/tvAttributeValue1"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="10dp"
+        android:autoLink="web"
+        android:paddingStart="5dp"
         android:textAlignment="viewEnd"
+        android:textColor="@color/textColorLight"
+        android:textColorLink="#0000EE"
+        android:textIsSelectable="true"
         android:textSize="@dimen/text_size_medium"
-        android:textColor="@color/textColor"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toEndOf="@+id/tvAttributeName"
-        app:layout_constraintTop_toTopOf="parent"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="parent"
-        android:layout_marginBottom="10dp"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/tvAttributeName" />
 
     <View
         android:id="@+id/vDivider"
         android:layout_width="0dp"
         android:layout_height="0.5dp"
         android:background="#A6A6A6"
-        app:layout_constraintStart_toStartOf="@id/tvAttributeName"
-        app:layout_constraintEnd_toEndOf="@+id/tvAttributeValue"
-        app:layout_constraintBottom_toBottomOf="parent"/>
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

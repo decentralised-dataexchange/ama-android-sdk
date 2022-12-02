@@ -4,19 +4,20 @@ plugins {
 }
 
 apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.google.gms.google-services'
 
 group='com.github.decentralised-dataexchange'
-version = '1.1.2'
+version = '1.12.1'
 
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 32
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         minSdkVersion 21
-        targetSdkVersion 30
-        versionCode 2
-        versionName "1.1.2"
+        targetSdkVersion 32
+        versionCode 3
+        versionName "1.12.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -47,11 +48,10 @@ dependencies {
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'
 
-    implementation 'org.hyperledger:indy:1.15.0'
-    implementation 'net.java.dev.jna:jna:4.5.1'
+    implementation 'org.hyperledger:indy:1.16.0'
+    implementation 'net.java.dev.jna:jna:5.6.0'
     implementation 'org.apache.commons:commons-lang3:3.7'
-    implementation 'commons-io:commons-io:2.6'
-
+    implementation 'commons-io:commons-io:2.8.0'
     //retrofit
     /*retrofit and services*/
     implementation('com.squareup.retrofit2:retrofit:2.7.1') {
@@ -72,7 +72,14 @@ dependencies {
 
     implementation 'com.github.koushikcse:LoadingButton:1.7'
 
-    implementation 'com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.3'
+    implementation 'com.github.mediapark-pk:Base58-android:0.1'
+    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
+    implementation 'com.tbuonomo:dotsindicator:4.2'
+
+    implementation 'com.github.L3-iGrant:qrcode_scanner_android:2.7.1'
+
+    implementation platform('com.google.firebase:firebase-bom:28.0.1')
+    implementation 'com.google.firebase:firebase-dynamic-links-ktx'
 }
 
 install {
@@ -100,12 +107,12 @@ install {
                 dependency {
                     groupId 'org.hyperledger'
                     artifactId 'indy'
-                    version '1.15.0'
+                    version '1.16.0'
                 }
                 dependency {
                     groupId 'net.java.dev.jna'
                     artifactId 'jna'
-                    version '4.5.1'
+                    version '5.6.0'
                 }
                 dependency {
                     groupId 'org.apache.commons'
@@ -115,7 +122,7 @@ install {
                 dependency {
                     groupId 'commons-io'
                     artifactId 'commons-io'
-                    version '2.6'
+                    version '2.8.0'
                 }
                 dependency {
                     groupId 'com.squareup.retrofit2'
@@ -140,7 +147,7 @@ install {
                 dependency {
                     groupId 'com.google.code.gson'
                     artifactId 'gson'
-                    version '2.6.8'
+                    version '2.8.6'
                 }
                 dependency {
                     groupId 'com.github.bumptech.glide'
@@ -168,9 +175,33 @@ install {
                     version '1.7'
                 }
                 dependency {
-                    groupId 'com.dlazaro66.qrcodereaderview'
-                    artifactId 'qrcodereaderview'
-                    version '2.0.3'
+                    groupId 'com.github.mediapark-pk'
+                    artifactId 'Base58-android'
+                    version '0.1'
+                }
+                dependency {
+                    groupId 'org.jetbrains.kotlinx'
+                    artifactId 'kotlinx-coroutines-android'
+                    version '1.5.2'
+                }
+                dependency {
+                    groupId 'com.tbuonomo'
+                    artifactId 'dotsindicator'
+                    version '4.2'
+                }
+                dependency {
+                    groupId 'com.github.L3-iGrant'
+                    artifactId 'qrcode_scanner_android'
+                    version '2.7.1'
+                }
+                dependency {
+                    groupId 'com.google.firebase'
+                    artifactId 'firebase-bom'
+                    version '28.0.1'
+                }
+                dependency {
+                    groupId 'com.google.firebase'
+                    artifactId 'firebase-dynamic-links-ktx'
                 }
             }
         }

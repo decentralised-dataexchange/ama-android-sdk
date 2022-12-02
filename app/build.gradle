@@ -1,16 +1,19 @@
 plugins {
     id 'com.android.application'
     id 'kotlin-android'
+
 }
 
+//apply plugin: 'com.google.gms.google-services'
+
 android {
-    compileSdkVersion 30
-    buildToolsVersion "30.0.2"
+    compileSdkVersion 32
+    buildToolsVersion "30.0.3"
 
     defaultConfig {
         applicationId "io.igrant.datawallet"
         minSdkVersion 21
-        targetSdkVersion 30
+        targetSdkVersion 32
         versionCode 1
         versionName "1.1.0"
 

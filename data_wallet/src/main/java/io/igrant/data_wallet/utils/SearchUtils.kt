@@ -6,22 +6,26 @@ import org.hyperledger.indy.sdk.non_secrets.WalletSearch
 
 object SearchUtils {
 
-    fun searchWallet(type: String,queryJson:String) : SearchResponse {
-        val search = WalletSearch.open(
-            WalletManager.getWallet,
-            type,
-            queryJson,
-            "{ \"retrieveRecords\": true, \"retrieveTotalCount\": true, \"retrieveType\": false, \"retrieveValue\": true, \"retrieveTags\": true }"
-        ).get()
-
-        val searchResponse =
-            WalletSearch.searchFetchNextRecords(
+    fun searchWallet(type: String,queryJson:String) :SearchResponse{
+        try {
+            val search = WalletSearch.open(
                 WalletManager.getWallet,
-                search,
-                100
+                type,
+                queryJson,
+                "{ \"retrieveRecords\": true, \"retrieveTotalCount\": true, \"retrieveType\": false, \"retrieveValue\": true, \"retrieveTags\": true }"
             ).get()
 
-        WalletManager.closeSearchHandle(search)
-       return WalletManager.getGson.fromJson(searchResponse, SearchResponse::class.java)
+            val searchResponse =
+                WalletSearch.searchFetchNextRecords(
+                    WalletManager.getWallet,
+                    search,
+                    1000
+                ).get()
+
+            WalletManager.closeSearchHandle(search)
+            return WalletManager.getGson.fromJson(searchResponse, SearchResponse::class.java)
+        } catch (e: Exception) {
+            return SearchResponse()
+        }
     }
 }

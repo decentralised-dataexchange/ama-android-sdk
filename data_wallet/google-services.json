@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "946790904355",
+    "project_id": "datawalletsdk",
+    "storage_bucket": "datawalletsdk.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:946790904355:android:2468fa80b880b65e14f796",
+        "android_client_info": {
+          "package_name": "io.igrant.data_wallet"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "946790904355-0arlrhsoa26jjfov9l2flr3b704r2k81.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDCZYE0v2AUM1rOwMIm7QTTXt4jHojtru4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "946790904355-0arlrhsoa26jjfov9l2flr3b704r2k81.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

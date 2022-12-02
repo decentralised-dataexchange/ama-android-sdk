@@ -1,10 +1,14 @@
 package io.igrant.data_wallet.tasks
 
 import android.os.AsyncTask
+import android.os.Handler
+import android.os.Looper
+import io.igrant.data_wallet.communication.ApiManager
 import io.igrant.data_wallet.handlers.CommonHandler
 import io.igrant.data_wallet.indy.WalletManager
 import io.igrant.data_wallet.models.MediatorConnectionObject
 import io.igrant.data_wallet.models.agentConfig.Invitation
+import io.igrant.data_wallet.models.connection.Protocol
 import io.igrant.data_wallet.models.connectionRequest.*
 import io.igrant.data_wallet.models.tagJsons.ConnectionId
 import io.igrant.data_wallet.models.tagJsons.UpdateInvitationKey
@@ -19,218 +23,213 @@ import org.hyperledger.indy.sdk.non_secrets.WalletRecord
 import org.json.JSONObject
 import java.io.IOException
 import java.util.*
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-class SaveConnectionTask(
-    private val commonHandler: CommonHandler,
-    private val invitation: Invitation
-) : AsyncTask<String, Void, Void>() {
+object SaveConnectionTask {
 
-    private lateinit var connectionRequestTypedBytes: RequestBody
-    private lateinit var typedBytes: RequestBody
-    private val TAG = "SaveConnectionTask"
+    fun saveConnection(
+        commonHandler: CommonHandler,
+        invitation: Invitation,
+        protocols: ArrayList<Protocol>?,
+        myDid: String?,
+        key: String?,
+        orgId: String?,
+        requestId: String?,
+        location: String?,
+        isDexaEnabled: Boolean
+    ) {
+        lateinit var connectionRequestTypedBytes: RequestBody
+        lateinit var typedBytes: RequestBody
+        val TAG = "SaveConnectionTask"
 
-    override fun doInBackground(vararg p0: String?): Void? {
+        commonHandler.taskStarted()
 
-        val myDid = p0[0] ?: ""
-        val key = p0[1] ?: ""
-        val orgId = p0[2] ?: ""
-        val requestId = p0[3] ?: ""
-        val location = p0[4] ?: ""
+        val executor: ExecutorService = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
 
-        val connectionValue =
-            WalletManager.getGson.toJson(
-                setUpMediatorConnectionObject(
+        executor.execute {
+            //Background work here
+            handler.post {
+                var connectionObject = setUpMediatorConnectionObject(
                     invitation,
-                    null,
-                    null
+                    requestId,
+                    myDid
                 )
-            )
-        val connectionUuid = UUID.randomUUID().toString()
+                connectionObject.orgId = orgId
+                connectionObject.location = location
+                connectionObject.protocols = protocols
+                connectionObject.isDexaEnabled = isDexaEnabled
+                val value = WalletManager.getGson.toJson(
+                    connectionObject
+                )
 
-        var invitationKey = UpdateInvitationKey(requestId, myDid, invitation.recipientKeys!![0], "", "")
-        invitationKey.state = ConnectionStates.CONNECTION_INVITATION
-        invitationKey.myKey = key
-        invitationKey.orgId= orgId
+                val connectionUuid = UUID.randomUUID().toString()
 
-        val connectionTagJson =
-            WalletManager.getGson.toJson(invitationKey)
+                var invitationKey =
+                    UpdateInvitationKey(requestId, myDid, invitation.recipientKeys!![0], "", "")
+                invitationKey.state = ConnectionStates.CONNECTION_INVITATION
+                invitationKey.myKey = key
+                invitationKey.orgId = orgId
 
-        WalletRecord.add(
-            WalletManager.getWallet,
-            WalletRecordType.CONNECTION,
-            connectionUuid,
-            connectionValue.toString(),
-            connectionTagJson.toString()
-        )
+                val connectionTagJson =
+                    WalletManager.getGson.toJson(invitationKey)
 
-        val connectionInvitationTagJson =
-            WalletManager.getGson.toJson(ConnectionId(connectionUuid))
-        val connectionInvitationUuid = UUID.randomUUID().toString()
+                WalletMethods.addWalletRecord(
+                    WalletManager.getWallet,
+                    WalletRecordType.CONNECTION,
+                    connectionUuid,
+                    value,
+                    connectionTagJson.toString()
+                )
 
-        WalletRecord.add(
-            WalletManager.getWallet,
-            WalletRecordType.CONNECTION_INVITATION,
-            connectionInvitationUuid,
-            WalletManager.getGson.toJson(invitation),
-            connectionInvitationTagJson
-        )
+                val connectionInvitationTagJson =
+                    WalletManager.getGson.toJson(ConnectionId(connectionUuid))
+                val connectionInvitationUuid = UUID.randomUUID().toString()
 
-        var connectionObject = setUpMediatorConnectionObject(
-            invitation,
-            requestId,
-            myDid
-        )
-        connectionObject.orgId = orgId
-        connectionObject.location = location
-        val value = WalletManager.getGson.toJson(
-            connectionObject
-        )
+                WalletMethods.addWalletRecord(
+                    WalletManager.getWallet,
+                    WalletRecordType.CONNECTION_INVITATION,
+                    connectionInvitationUuid,
+                    WalletManager.getGson.toJson(invitation),
+                    connectionInvitationTagJson
+                )
 
-        WalletRecord.updateValue(
-            WalletManager.getWallet,
-            WalletRecordType.CONNECTION,
-            connectionUuid,
-            value
-        )
+                val messageUuid = UUID.randomUUID().toString()
 
-        val messageUuid = UUID.randomUUID().toString()
+                val data = "{\n" +
+                        "    \"@id\": \"$messageUuid\",\n" +
+                        "    \"@type\": \"${DidCommPrefixUtils.getType(DidCommPrefixUtils.MEDIATOR)}/basic-routing/1.0/add-route\",\n" +
+                        "    \"routedestination\": \"$key\",\n" +
+                        "    \"~transport\": {\n" +
+                        "        \"return_route\": \"all\"\n" +
+                        "    }\n" +
+                        "}\n"
 
-        val data = "{\n" +
-                "    \"@id\": \"$messageUuid\",\n" +
-                "    \"@type\": \"${DidCommPrefixUtils.getType(DidCommPrefixUtils.MEDIATOR)}/basic-routing/1.0/add-route\",\n" +
-                "    \"routedestination\": \"$key\",\n" +
-                "    \"~transport\": {\n" +
-                "        \"return_route\": \"all\"\n" +
-                "    }\n" +
-                "}\n"
+                val mediatorConnection = SearchUtils.searchWallet(
+                    WalletRecordType.MEDIATOR_CONNECTION,
+                    "{}"
+                )
 
-        val mediatorConnection = SearchUtils.searchWallet(
-            WalletRecordType.MEDIATOR_CONNECTION,
-            "{}"
-        )
+                val mediatorConnectionObject = WalletManager.getGson.fromJson(
+                    mediatorConnection.records?.get(0)?.value,
+                    MediatorConnectionObject::class.java
+                )
+                val connectionDid = mediatorConnectionObject.myDid
 
-        val mediatorConnectionObject = WalletManager.getGson.fromJson(
-            mediatorConnection.records?.get(0)?.value,
-            MediatorConnectionObject::class.java
-        )
-        val connectionDid = mediatorConnectionObject.myDid
+                val connectionMetaString =
+                    Did.getDidWithMeta(WalletManager.getWallet, connectionDid).get()
+                val connectionMetaObject = JSONObject(connectionMetaString)
+                val connectedKey = connectionMetaObject.getString("verkey")
 
-        val connectionMetaString =
-            Did.getDidWithMeta(WalletManager.getWallet, connectionDid).get()
-        val connectionMetaObject = JSONObject(connectionMetaString)
-        val connectedKey = connectionMetaObject.getString("verkey")
+                val mediatorDidDoc = SearchUtils.searchWallet(MEDIATOR_DID_DOC, "{}")
 
-        val mediatorDidDoc = SearchUtils.searchWallet(MEDIATOR_DID_DOC, "{}")
+                val didDocObj = WalletManager.getGson.fromJson(
+                    mediatorDidDoc.records?.get(0)?.value,
+                    DidDoc::class.java
+                )
 
-        val didDocObj = WalletManager.getGson.fromJson(
-            mediatorDidDoc.records?.get(0)?.value,
-            DidDoc::class.java
-        )
+                val packedMessage = PackingUtils.packMessage(
+                    "[\"${didDocObj.publicKey!![0].publicKeyBase58}\"]",
+                    connectedKey,
+                    data
+                )
 
-        val packedMessage = PackingUtils.packMessage("[\"${didDocObj.publicKey!![0].publicKeyBase58}\"]",connectedKey,data)
+                typedBytes = object : RequestBody() {
+                    override fun contentType(): MediaType? {
+                        return "application/ssi-agent-wire".toMediaTypeOrNull()
+                    }
 
-        typedBytes = object : RequestBody() {
-            override fun contentType(): MediaType? {
-                return "application/ssi-agent-wire".toMediaTypeOrNull()
-            }
+                    @Throws(IOException::class)
+                    override fun writeTo(sink: BufferedSink) {
+                        sink.write(packedMessage)
+                    }
+                }
 
-            @Throws(IOException::class)
-            override fun writeTo(sink: BufferedSink) {
-                sink.write(packedMessage)
-            }
-        }
+                //public keys
+                val publicKey = PublicKey()
+                publicKey.id = "did:sov:$myDid#1"
+                publicKey.type = "Ed25519VerificationKey2018"
+                publicKey.controller = "did:sov:$myDid"
+                publicKey.publicKeyBase58 = key
 
-        //public keys
-        val publicKey = PublicKey()
-        publicKey.id = "did:sov:$myDid#1"
-        publicKey.type = "Ed25519VerificationKey2018"
-        publicKey.controller = "did:sov:$myDid"
-        publicKey.publicKeyBase58 = key
+                val publicKeys: ArrayList<PublicKey> = ArrayList()
+                publicKeys.add(publicKey)
 
-        val publicKeys: ArrayList<PublicKey> = ArrayList()
-        publicKeys.add(publicKey)
+                //authentication
+                val authentication = Authentication()
+                authentication.type = "Ed25519SignatureAuthentication2018"
+                authentication.publicKey = "did:sov:$myDid#1"
 
-        //authentication
-        val authentication = Authentication()
-        authentication.type = "Ed25519SignatureAuthentication2018"
-        authentication.publicKey = "did:sov:$myDid#1"
+                val authentications: ArrayList<Authentication> = ArrayList()
+                authentications.add(authentication)
 
-        val authentications: ArrayList<Authentication> = ArrayList()
-        authentications.add(authentication)
+                //service
+                val recipientsKey: ArrayList<String> = ArrayList()
+                recipientsKey.add(key ?: "")
 
-        //service
-        val recipientsKey: ArrayList<String> = ArrayList()
-        recipientsKey.add(key)
+                //service
+                val routis: ArrayList<String> = ArrayList()
+                routis.add(didDocObj.service!![0].routingKeys!![0])
 
-        //service
-        val routis: ArrayList<String> = ArrayList()
-        routis.add(didDocObj.service!![0].routingKeys!![0])
+                val service = Service()
+                service.id = "did:sov:$myDid;indy"
+                service.type = "IndyAgent"
+                service.priority = 0
+                service.recipientKeys = recipientsKey
+                service.routingKeys = routis
+                service.serviceEndpoint = ApiManager.API_URL
 
-        val service = Service()
-        service.id = "did:sov:$myDid;indy"
-        service.type = "IndyAgent"
-        service.priority = 0
-        service.recipientKeys = recipientsKey
-        service.routingKeys = routis
-        service.serviceEndpoint = "https://mediator.igrant.io"
+                val services: ArrayList<Service> = ArrayList()
+                services.add(service)
 
-        val services: ArrayList<Service> = ArrayList()
-        services.add(service)
+                //did doc
+                val didDoc = DidDoc()
+                didDoc.context = "https://w3id.org/did/v1"
+                didDoc.id = "did:sov:$myDid"
+                didDoc.publicKey = publicKeys
+                didDoc.authentication = authentications
+                didDoc.service = services
 
-        //did doc
-        val didDoc = DidDoc()
-        didDoc.context = "https://w3id.org/did/v1"
-        didDoc.id = "did:sov:$myDid"
-        didDoc.publicKey = publicKeys
-        didDoc.authentication = authentications
-        didDoc.service = services
-
-        //did
-        val did = DID()
-        did.did = myDid
-        did.didDoc = didDoc
+                //did
+                val did = DID()
+                did.did = myDid
+                did.didDoc = didDoc
 
 //         transport
-        val transport = Transport()
-        transport.returnRoute = "all"
+                val transport = Transport("all")
 
-        //connection request
-        val connectionRequest = ConnectionRequest()
-        connectionRequest.type = "${DidCommPrefixUtils.getType(DidCommPrefixUtils.MEDIATOR)}/connections/1.0/request"
-        connectionRequest.id = UUID.randomUUID().toString()
-        connectionRequest.label = DeviceUtils.getDeviceName() ?: ""
-        connectionRequest.connection = did
-        connectionRequest.transport = transport
+                //connection request
+                val connectionRequest = ConnectionRequest()
+                connectionRequest.type =
+                    "${DidCommPrefixUtils.getType(DidCommPrefixUtils.MEDIATOR)}/connections/1.0/request"
+                connectionRequest.id = UUID.randomUUID().toString()
+                connectionRequest.label = DeviceUtils.getDeviceName() ?: ""
+                connectionRequest.connection = did
+                connectionRequest.transport = transport
 
-        val connectionRequestData = WalletManager.getGson.toJson(connectionRequest)
+                val connectionRequestData = WalletManager.getGson.toJson(connectionRequest)
 
-        val connectionRequestPackedMessage =
-                PackingUtils.packMessage(invitation, key, connectionRequestData,"")
+                val connectionRequestPackedMessage =
+                    PackingUtils.packMessage(invitation, key ?: "", connectionRequestData, "")
 
-        connectionRequestTypedBytes = object : RequestBody() {
-            override fun contentType(): MediaType? {
-                return "application/ssi-agent-wire".toMediaTypeOrNull()
-            }
+                connectionRequestTypedBytes = object : RequestBody() {
+                    override fun contentType(): MediaType? {
+                        return "application/ssi-agent-wire".toMediaTypeOrNull()
+                    }
 
-            @Throws(IOException::class)
-            override fun writeTo(sink: BufferedSink) {
-                sink.write(connectionRequestPackedMessage)
+                    @Throws(IOException::class)
+                    override fun writeTo(sink: BufferedSink) {
+                        sink.write(connectionRequestPackedMessage)
+                    }
+                }
+
+                commonHandler.onSaveConnection(
+                    typedBytes,
+                    connectionRequestTypedBytes
+                )
             }
         }
-        return null
-    }
-
-    override fun onPreExecute() {
-        super.onPreExecute()
-        commonHandler.taskStarted()
-    }
-
-    override fun onPostExecute(result: Void?) {
-        super.onPostExecute(result)
-        commonHandler.onSaveConnection(
-            typedBytes,
-            connectionRequestTypedBytes
-        )
     }
 
     private fun setUpMediatorConnectionObject(
@@ -252,8 +251,8 @@ class SaveConnectionTask(
         else
             connectionObject.invitationKey = ""
 
-        connectionObject.createdAt = "2020-10-22 12:20:23.188047Z"
-        connectionObject.updatedAt = "2020-10-22 12:20:23.188047Z"
+        connectionObject.createdAt = DateUtils.getIndyFormattedDate()
+        connectionObject.updatedAt = DateUtils.getIndyFormattedDate()
 
         connectionObject.theirLabel = invitation?.label
         connectionObject.state =

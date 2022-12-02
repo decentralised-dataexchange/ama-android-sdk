@@ -1,0 +1,101 @@
+{
+  "project_info": {
+    "project_number": "872246932852",
+    "firebase_url": "https://jenkins-189019.firebaseio.com",
+    "project_id": "jenkins-189019",
+    "storage_bucket": "jenkins-189019.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:872246932852:android:91b23f8ecf21da8218e821",
+        "android_client_info": {
+          "package_name": "io.igrant.mobileagent"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "872246932852-n5kpgu98sk5qkp7krsijf50tgpheom7d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.igrant.mobileagent",
+            "certificate_hash": "3b54d25e3b41a683aa2a9a84ec9e21499ae40ffc"
+          }
+        },
+        {
+          "client_id": "872246932852-bqa0iba0pabd6kl844vi70ad9j0jutup.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOZtiOwrqPBe42rWeh0dNaOj2RvxtyoUU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "872246932852-bqa0iba0pabd6kl844vi70ad9j0jutup.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "872246932852-3uaa2jl0ud28j8tahaeho22br9cvhtus.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.lcubed.iGrant",
+                "app_store_id": "1440640074"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:872246932852:android:d95df09155ca222c",
+        "android_client_info": {
+          "package_name": "io.igrant.mobileapp"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "872246932852-aro3vpinsb4r1o7ss0ktg983ifei49a9.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.igrant.mobileapp",
+            "certificate_hash": "3b54d25e3b41a683aa2a9a84ec9e21499ae40ffc"
+          }
+        },
+        {
+          "client_id": "872246932852-bqa0iba0pabd6kl844vi70ad9j0jutup.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBOZtiOwrqPBe42rWeh0dNaOj2RvxtyoUU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "872246932852-bqa0iba0pabd6kl844vi70ad9j0jutup.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "872246932852-3uaa2jl0ud28j8tahaeho22br9cvhtus.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.lcubed.iGrant",
+                "app_store_id": "1440640074"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/clItem"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginBottom="10dp">
+
+    <TextView
+        android:id="@+id/tvSectorName"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:paddingTop="5dp"
+        android:paddingBottom="5dp"
+        android:text="Health Care"
+        android:textAllCaps="true"
+        android:textColor="@color/textColor"
+        android:textSize="@dimen/text_size_normal"
+        android:textStyle="normal"
+        app:layout_constraintEnd_toStartOf="@+id/info"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ImageView
+        android:layout_width="25dp"
+        android:layout_height="25dp"
+        android:src="@drawable/ic_info"
+        app:layout_constraintStart_toEndOf="@+id/tvSectorName"
+        app:layout_constraintEnd_toStartOf="@+id/swSector"
+        android:id="@+id/info"
+        android:layout_marginStart="5dp"
+        app:layout_constraintTop_toTopOf="@+id/tvSectorName"
+        app:layout_constraintBottom_toBottomOf="@+id/tvSectorName"/>
+
+    <androidx.appcompat.widget.SwitchCompat
+        android:id="@+id/swSector"
+        android:layout_width="40dp"
+        android:layout_height="25dp"
+        android:layout_marginEnd="10dp"
+        android:layout_marginStart="5dp"
+        android:scaleX="1"
+        android:scaleY="1"
+        android:clickable="false"
+        android:thumb="@drawable/switch_ios_selection"
+        app:layout_constraintBottom_toBottomOf="@+id/tvSectorName"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/info"
+        app:layout_constraintTop_toTopOf="@+id/tvSectorName"
+        app:track="@drawable/switch_ios_track" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/rvCompanies"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="5dp"
+        android:background="@drawable/primary_background"
+        android:padding="10dp"
+        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSectorName"
+        tools:listitem="@layout/item_third_party_data_sharing_companies" />
+</androidx.constraintlayout.widget.ConstraintLayout>

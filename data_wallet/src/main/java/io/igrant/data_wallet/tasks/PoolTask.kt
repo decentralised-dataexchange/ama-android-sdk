@@ -1,40 +1,41 @@
 package io.igrant.data_wallet.tasks
 
+import android.content.Context
 import android.os.AsyncTask
+import android.os.Handler
+import android.os.Looper
 import io.igrant.data_wallet.handlers.PoolHandler
-import io.igrant.data_wallet.indy.PoolUtils
-import org.hyperledger.indy.sdk.pool.Pool
+import io.igrant.data_wallet.utils.PoolUtils
+import java.util.concurrent.ExecutorService
+import java.util.concurrent.Executors
 
-class PoolTask(
-    private val poolHandler: PoolHandler,
-    private val networkType: Int
-) : AsyncTask<Void, Void, Void>() {
-    lateinit var pool: Pool
-    override fun doInBackground(vararg p0: Void?): Void? {
-
-        val pool = PoolUtils.createAndOpenPoolLedger(networkType)
-
-        //commenting for performance
-//        val acceptanceMech = Ledger.buildGetAcceptanceMechanismsRequest(null, -1, null).get()
-//
-//        Ledger.submitRequest(pool, acceptanceMech).get()
-//
-//        val agreementResponse = Ledger.buildGetTxnAuthorAgreementRequest(null, null).get()
-//
-//        Ledger.submitRequest(pool, agreementResponse).get()
-        //commenting for performance
-
-        this.pool = pool
-        return null
-    }
-
-    override fun onPreExecute() {
-        super.onPreExecute()
+object PoolTask {
+    fun executePoolTask(
+        poolHandler: PoolHandler,
+        networkType: Int,
+        context: Context
+    ) {
         poolHandler.taskStarted()
-    }
+        val executor: ExecutorService = Executors.newSingleThreadExecutor()
+        val handler = Handler(Looper.getMainLooper())
 
-    override fun onPostExecute(result: Void?) {
-        super.onPostExecute(result)
-        poolHandler.taskCompleted(pool)
+        executor.execute {
+            //Background work here
+            handler.post {
+                val pool = PoolUtils.createAndOpenPoolLedger(networkType, context)
+
+                //commenting for performance
+//        val acceptanceMech = io.igrant.data_wallet.models.ledger.Ledger.buildGetAcceptanceMechanismsRequest(null, -1, null).get()
+//
+//        io.igrant.data_wallet.models.ledger.Ledger.submitRequest(pool, acceptanceMech).get()
+//
+//        val agreementResponse = io.igrant.data_wallet.models.ledger.Ledger.buildGetTxnAuthorAgreementRequest(null, null).get()
+//
+//        io.igrant.data_wallet.models.ledger.Ledger.submitRequest(pool, agreementResponse).get()
+                //commenting for performance
+
+                poolHandler.taskCompleted(pool)
+            }
+        }
     }
 }

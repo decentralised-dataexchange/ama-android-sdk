@@ -48,7 +48,7 @@
                         android:id="@+id/ivLogo"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
-                        android:contentDescription="@string/txt_logo"
+                        android:contentDescription="@string/connection_logo"
                         android:src="@drawable/images" />
                 </androidx.cardview.widget.CardView>
 
@@ -84,9 +84,9 @@
                         android:layout_height="wrap_content"
                         android:layout_gravity="start"
                         android:layout_marginTop="10dp"
-                        android:text="@string/txt_org_overview"
-                        android:textAllCaps="true"
-                        android:textColor="@color/Black"
+                        android:text="@string/connection_overview"
+                        android:textAllCaps="false"
+                        android:textColor="@color/textColorLight"
                         android:textSize="@dimen/text_size_normal" />
 
                     <TextView
@@ -98,7 +98,7 @@
                         android:text="----------"
                         android:justificationMode="inter_word"
                         android:textAlignment="viewStart"
-                        android:textColor="@color/textColor"
+                        android:textColor="@color/textColorLight"
                         android:textSize="@dimen/text_size_medium" />
                 </LinearLayout>
 
@@ -107,7 +107,7 @@
                     android:layout_height="wrap_content"
                     android:layout_gravity="start"
                     android:layout_marginTop="10dp"
-                    android:text="@string/txt_data_agreement"
+                    android:text="@string/general_data_agreement"
                     android:textAllCaps="true"
                     android:layout_marginBottom="10dp"
                     android:textColor="@color/Black"
@@ -135,38 +135,73 @@
                         android:layout_marginTop="10dp"
                         android:padding="20dp"
                         android:textColor="@color/textColor"
-                        android:text="@string/txt_no_data_avaialable"
+                        android:text="@string/connection_no_data_available"
                         android:textSize="@dimen/text_size_normal" />
 
                 </LinearLayout>
 
-                <LinearLayout
-                    android:id="@+id/llUsagePurposes"
+                <!--                <LinearLayout-->
+                <!--                    android:id="@+id/llUsagePurposes"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:orientation="vertical">-->
+
+                <!--                    <androidx.recyclerview.widget.RecyclerView-->
+                <!--                        android:id="@+id/rvConnectionMessages"-->
+                <!--                        android:layout_width="match_parent"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:layout_marginTop="5dp"-->
+                <!--                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"-->
+                <!--                        tools:listitem="@layout/item_connection_messaages" />-->
+                <!--                </LinearLayout>-->
+
+                <TextView
+                    android:id="@+id/tvMySharedData"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:background="@drawable/primary_background"
+                    android:paddingStart="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingEnd="20dp"
+                    android:text="@string/welcome_my_shared_data"
+                    android:textSize="@dimen/text_size_medium"
+                    android:textColor="@color/black"
+                    android:layout_marginTop="10dp"
+                    android:gravity="start"
+                    android:drawableEnd="@drawable/ic_arrow_forward"/>
 
-                    <androidx.recyclerview.widget.RecyclerView
-                        android:id="@+id/rvConnectionMessages"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="5dp"
-                        app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"
-                        tools:listitem="@layout/item_connection_messaages" />
-                </LinearLayout>
-
+                <TextView
+                    android:id="@+id/tv3ppDataSharing"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/primary_background"
+                    android:paddingStart="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingEnd="20dp"
+                    android:enabled="true"
+                    android:text="@string/connection_third_party_data_sharing"
+                    android:textSize="@dimen/text_size_medium"
+                    android:textColor="@color/textColorVeryLight"
+                    android:layout_marginTop="10dp"
+                    android:gravity="start"
+                    android:drawableEnd="@drawable/ic_arrow_forward"/>
 
                 <TextView
                     android:id="@+id/tvRemove"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/primary_background"
-                    android:padding="10dp"
-                    android:text="@string/txt_remove_organization"
+                    android:paddingStart="10dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingEnd="20dp"
+                    android:text="@string/data_remove_organisation"
                     android:textSize="@dimen/text_size_medium"
                     android:textColor="@color/red"
                     android:layout_marginTop="10dp"
-                    android:gravity="center"/>
+                    android:gravity="start"/>
 
             </LinearLayout>
         </LinearLayout>
@@ -186,6 +221,8 @@
         android:id="@+id/llProgressBar"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:animateLayoutChanges="true"
+        android:background="@color/bgColor"
         android:clickable="true"
         android:gravity="center"
         android:orientation="vertical"

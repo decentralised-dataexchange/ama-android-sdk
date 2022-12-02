@@ -2,17 +2,25 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="io.igrant.data_wallet">
 
-    <application>
+    <application
+        android:requestLegacyExternalStorage="true">
         <activity
             android:name=".activity.InitializeActivity"
             android:label="@string/app_name"
             android:launchMode="singleTask"
-            android:theme="@style/SplashTheme">
+            android:theme="@style/SplashTheme"
+            android:exported="true">
 
+
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW"/>
+                <category android:name="android.intent.category.DEFAULT"/>
+                <category android:name="android.intent.category.BROWSABLE"/>
+                <data
+                    android:host="igrant.page.link"
+                    android:scheme="https"/>
+            </intent-filter>
         </activity>
-
-        <activity android:name=".qrcode.QrCodeActivity"
-            android:theme="@style/AppTheme.NoActionBar"/>
 
         <activity android:name=".activity.OfferCertificateActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
@@ -32,5 +40,10 @@
         <activity android:name=".activity.ConnectionListActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
 
+        <activity android:name=".activity.HistoryActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".activity.HistoryDetailActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 </manifest>
