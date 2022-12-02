@@ -1,6 +1,7 @@
 package io.igrant.data_wallet.activity
 
 import android.Manifest
+import android.app.Activity
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -13,6 +14,8 @@ import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
 import android.util.Base64
+import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.EditText
@@ -20,46 +23,54 @@ import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.firebase.dynamiclinks.ktx.dynamicLinks
+import com.google.firebase.ktx.Firebase
 import io.igrant.data_wallet.R
 import io.igrant.data_wallet.adapter.ConnectionListAdapter
 import io.igrant.data_wallet.communication.ApiManager
+import io.igrant.data_wallet.custom.ItemDecorator
 import io.igrant.data_wallet.events.RefreshConnectionList
 import io.igrant.data_wallet.indy.WalletManager
 import io.igrant.data_wallet.listeners.ConnectionClickListener
-import io.igrant.data_wallet.models.agentConfig.Invitation
-import io.igrant.data_wallet.models.qr.QrDecode
-import io.igrant.data_wallet.qrcode.QrCodeActivity
-import io.igrant.data_wallet.utils.PermissionUtils
-import io.igrant.data_wallet.utils.WalletRecordType
-import io.igrant.data_wallet.dailogFragments.ConnectionProgressDailogFragment
-import io.igrant.data_wallet.utils.ExtractUrlListeners
-import io.igrant.data_wallet.utils.ExtractUrlUtil
+import io.igrant.data_wallet.fragment.FilterBottomSheetFragment
+import io.igrant.data_wallet.fragment.UrlExtractFragment
+import io.igrant.data_wallet.listeners.ConnectionFilterClickListener
+import io.igrant.data_wallet.models.ConnectionFilter
+import io.igrant.data_wallet.utils.*
+import io.igrant.qrcode_scanner_android.qrcode.utils.QRScanner
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 import org.hyperledger.indy.sdk.non_secrets.WalletSearch
 import org.json.JSONArray
 import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 
-
-class ConnectionListActivity : BaseActivity(),
-    ConnectionProgressDailogFragment.OnConnectionSuccess {
+class ConnectionListActivity : BaseActivity(), UrlExtractFragment.ProgressListener,
+    ConnectionFilterClickListener {
 
     private lateinit var connectionRecords: JSONArray
-    private lateinit var connectionRecordsCopy: JSONArray
-    private lateinit var walletCertificateAdapter: ConnectionListAdapter
+    private var connectionRecordsCopy: JSONArray? = null
+    private var walletCertificateAdapter: ConnectionListAdapter? = null
     private lateinit var rvConnections: RecyclerView
     private lateinit var llErrorMessage: LinearLayout
     private lateinit var etSearch: EditText
     private lateinit var toolbar: Toolbar
     private lateinit var ivAdd: ImageView
+    private lateinit var llProgressBar: LinearLayout
+
+    private var filter: ConnectionFilter? = ConnectionFilter(
+        id = ConnectionFilterUtil.CONNECTION_FILTER_ALL,
+        isEnabled = true,
+        isSelected = true,
+        logo = null
+    )
 
     companion object {
+        private const val TAG = "ConnectionListActivity"
         private const val PICK_IMAGE_REQUEST = 101
         val PERMISSIONS =
             arrayOf(Manifest.permission.CAMERA)
@@ -72,8 +83,9 @@ class ConnectionListActivity : BaseActivity(),
         setContentView(R.layout.activity_connection_list)
         initViews()
         setUpToolbar()
-        initListener()
         getConnectionList()
+        initListener()
+
         try {
             EventBus.getDefault().register(this)
         } catch (e: Exception) {
@@ -88,15 +100,19 @@ class ConnectionListActivity : BaseActivity(),
         supportActionBar!!.setDisplayHomeAsUpEnabled(true)
     }
 
-//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-//        menuInflater.inflate(R.menu.main_menu, menu)
-//        return true
-//    }
-
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         return when (item.itemId) {
             android.R.id.home -> {
                 onBackPressed()
+                true
+            }
+            R.id.action_filter -> {
+                val blankFragment = FilterBottomSheetFragment.newInstance(
+                    FilterType.CONNECTION,
+                    filter?.id
+                )
+                blankFragment.show(supportFragmentManager, " blankFragment.tag")
+
                 true
             }
             else -> super.onOptionsItemSelected(item)
@@ -104,65 +120,101 @@ class ConnectionListActivity : BaseActivity(),
     }
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
-        if (requestCode == REQUEST_CODE_SCAN_INVITATION) {
+        if (requestCode == REQUEST_CODE_SCAN_INVITATION && resultCode == Activity.RESULT_OK) {
             if (data == null) return
 
-            val uri: Uri = try {
-                Uri.parse(data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult"))
-            } catch (e: Exception) {
-                Uri.parse("igrant.io")
-            }
-            ExtractUrlUtil.extractUrl(uri, object : ExtractUrlListeners {
-                override fun onSuccessFullyExecutedConnectionRequest(
-                    invitation: Invitation,
-                    proposal: String
-                ) {
-                    Handler(Looper.getMainLooper()).postDelayed({
-                        val connectionSuccessDialogFragment: ConnectionProgressDailogFragment =
-                            ConnectionProgressDailogFragment.newInstance(
-                                false,
-                                invitation,
-                                proposal
-                            )
-                        connectionSuccessDialogFragment.show(
-                            supportFragmentManager,
-                            "fragment_edit_name"
-                        )
-                    }, 200)
+            try {
+                val uri: Uri = try {
+                    Uri.parse(data.getStringExtra("com.blikoon.qrcodescanner.got_qr_scan_relult"))
+                } catch (e: Exception) {
+                    Uri.parse("igrant.io")
                 }
 
-                override fun onFailureRequest() {
-                    Toast.makeText(
-                        this@ConnectionListActivity,
-                        resources.getString(R.string.err_unexpected),
-                        Toast.LENGTH_SHORT
-                    ).show()
+                if (ConnectionUtils.isIGrnatValidUrl(uri.toString())) {
+                    Firebase.dynamicLinks
+                        .getDynamicLink(uri)
+                        .addOnSuccessListener(this) { pendingDynamicLinkData ->
+                            // Get deep link from result (may be null if no link is found)
+                            var deepLink: Uri? = null
+                            if (pendingDynamicLinkData != null) {
+                                deepLink = pendingDynamicLinkData.link
+
+                                try {
+                                    val deepLinkUri: Uri = deepLink ?: Uri.parse("igrant.io")
+
+                                    extractFromUri(deepLinkUri)
+                                } catch (e: Exception) {
+                                    Toast.makeText(
+                                        this,
+                                        resources.getString(R.string.connection_unexpected_error_please_try_again),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                        .addOnFailureListener(this) { e ->
+                            Log.w(
+                                InitializeActivity.TAG,
+                                "getDynamicLink:onFailure",
+                                e
+                            )
+                        }
+                } else {
+                    extractFromUri(uri)
                 }
-            })
+            } catch (e: Exception) {
+                Toast.makeText(
+                    this,
+                    resources.getString(R.string.connection_unexpected_error_please_try_again),
+                    Toast.LENGTH_SHORT
+                ).show()
+            }
+//
         }
         super.onActivityResult(requestCode, resultCode, data)
     }
 
+    private var frag: UrlExtractFragment? = null
+    private fun extractFromUri(uri: Uri) {
+
+        if (supportFragmentManager
+                .findFragmentByTag("counter_fragment") != null
+        )
+            frag = supportFragmentManager
+                .findFragmentByTag("counter_fragment") as UrlExtractFragment
+        if (frag == null) {
+            frag = UrlExtractFragment.newInstance()
+            supportFragmentManager.beginTransaction().add(frag!!, "counter_fragment")
+                .commitAllowingStateLoss()
+            frag?.setProgressListener(this)
+        }
+
+        if (frag != null)
+            frag?.extractUrl(uri)
+    }
+
     private fun getConnectionList() {
-        val search = WalletSearch.open(
-            WalletManager.getWallet,
-            WalletRecordType.CONNECTION,
-            "{}",
-            "{ \"retrieveRecords\": true, \"retrieveTotalCount\": true, \"retrieveType\": false, \"retrieveValue\": true, \"retrieveTags\": true }"
-        ).get()
+        if (WalletManager.getWallet != null) {
+            val search = WalletSearch.open(
+                WalletManager.getWallet,
+                WalletRecordType.CONNECTION,
+                "{}",
+                "{ \"retrieveRecords\": true, \"retrieveTotalCount\": true, \"retrieveType\": false, \"retrieveValue\": true, \"retrieveTags\": true }"
+            ).get()
 
-        val connection =
-            WalletSearch.searchFetchNextRecords(WalletManager.getWallet, search, 100).get()
+            val connection =
+                WalletSearch.searchFetchNextRecords(WalletManager.getWallet, search, 100).get()
 
-        WalletSearch.closeSearch(search)
-        val data = JSONObject(connection)
-        if (data.getInt("totalCount") > 0) {
-            llErrorMessage.visibility = View.GONE
-            connectionRecords = JSONArray(data.get("records").toString())
-            connectionRecordsCopy = JSONArray(data.get("records").toString())
-            setUpCertificateList()
-        } else {
-            llErrorMessage.visibility = View.VISIBLE
+            WalletSearch.closeSearch(search)
+            val data = JSONObject(connection)
+            if (data.getInt("totalCount") > 0) {
+                llErrorMessage.visibility = View.GONE
+                connectionRecords = JSONArray(data.get("records").toString())
+                connectionRecordsCopy = JSONArray(data.get("records").toString())
+                setUpCertificateList()
+            } else {
+                llErrorMessage.visibility = View.VISIBLE
+            }
         }
     }
 
@@ -183,9 +235,21 @@ class ConnectionListActivity : BaseActivity(),
 //                    DeleteUtils.deleteConnection(connection)
                 }
             })
-        rvConnections.layoutManager = GridLayoutManager(this, 3)
+        val layoutManager = LinearLayoutManager(this)
+        val dividerItemDecoration = ItemDecorator(
+            ContextCompat.getDrawable(this, R.drawable.list_divider_layer)!!
+        )
+//        dividerItemDecoration.setDrawable(resources.getDrawable(R.drawable.list_divider_layer, null))
+        rvConnections.addItemDecoration(dividerItemDecoration)
+
+        rvConnections.layoutManager = layoutManager
         rvConnections.adapter = walletCertificateAdapter
     }
+
+//    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+//        menuInflater.inflate(R.menu.menu_filter, menu)
+//        return true
+//    }
 
     private fun initListener() {
         ivAdd.setOnClickListener {
@@ -196,9 +260,8 @@ class ConnectionListActivity : BaseActivity(),
                     PERMISSIONS
                 )
             ) {
-                val i = Intent(this, QrCodeActivity::class.java)
-                startActivityForResult(
-                    i,
+                QRScanner().withLocale(LocaleHelper.getLanguage(this)).start(
+                    this,
                     REQUEST_CODE_SCAN_INVITATION
                 )
             }
@@ -224,9 +287,8 @@ class ConnectionListActivity : BaseActivity(),
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-            val i = Intent(this, QrCodeActivity::class.java)
-            startActivityForResult(
-                i,
+            QRScanner().withLocale(LocaleHelper.getLanguage(this)).start(
+                this,
                 REQUEST_CODE_SCAN_INVITATION
             )
         }
@@ -235,21 +297,24 @@ class ConnectionListActivity : BaseActivity(),
     private fun filterList(s: CharSequence?) {
         val tempList: ArrayList<JSONObject> = ArrayList()
 
-        for (i in 0 until connectionRecordsCopy.length()) {
-            try {
-                val title = JSONObject(
-                    connectionRecordsCopy.getJSONObject(i).getString("value")
-                ).getString("their_label")
-                if (title.contains(s ?: "", ignoreCase = true)) {
-                    tempList.add(connectionRecordsCopy.getJSONObject(i))
+        if (connectionRecordsCopy != null)
+            for (i in 0 until connectionRecordsCopy!!.length()) {
+                try {
+                    if (connectionRecordsCopy?.getJSONObject(i)?.has("value") == true) {
+                        val title = JSONObject(
+                            connectionRecordsCopy?.getJSONObject(i)!!.getString("value")
+                        ).getString("their_label")
+                        if (title.contains(s ?: "", ignoreCase = true)) {
+                            tempList.add(connectionRecordsCopy?.getJSONObject(i)!!)
+                        }
+                    }
+                } catch (e: Exception) {
                 }
-            } catch (e: Exception) {
             }
-        }
 
         connectionRecords = JSONArray(tempList)
 
-        walletCertificateAdapter.setList(connectionRecords)
+        walletCertificateAdapter?.setList(connectionRecords)
 
     }
 
@@ -259,10 +324,7 @@ class ConnectionListActivity : BaseActivity(),
         llErrorMessage = findViewById(R.id.llErrorMessage)
         etSearch = findViewById(R.id.etSearch)
         ivAdd = findViewById(R.id.ivAdd)
-    }
-
-    override fun onSuccess(proposal: String, orgId: String) {
-        getConnectionList()
+        llProgressBar = findViewById(R.id.llProgressBar)
     }
 
     override fun onDestroy() {
@@ -276,6 +338,19 @@ class ConnectionListActivity : BaseActivity(),
     @Subscribe(threadMode = ThreadMode.MAIN)
     fun refreshList(event: RefreshConnectionList) {
         getConnectionList()
+    }
+
+    override fun updateProgress(progress: Int) {
+        llProgressBar.visibility = progress
+    }
+
+    override fun error(explain: String) {
+        llProgressBar.visibility = View.GONE
+        Toast.makeText(this, explain, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onFilterClick(filter: ConnectionFilter) {
+        this.filter = filter
     }
 
 }

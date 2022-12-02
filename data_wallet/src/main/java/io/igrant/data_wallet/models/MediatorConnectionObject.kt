@@ -2,6 +2,7 @@ package io.igrant.data_wallet.models
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import io.igrant.data_wallet.models.connection.Protocol
 import java.io.Serializable
 
 class MediatorConnectionObject :Serializable{
@@ -21,6 +22,14 @@ class MediatorConnectionObject :Serializable{
     @SerializedName("is_igrant_enabled")
     @Expose
     var isIGrantEnabled: Boolean? = false
+
+    @SerializedName("connectionType")
+    @Expose
+    var connectionType: String? = ""
+
+    @SerializedName("protocols")
+    @Expose
+    var protocols: ArrayList<Protocol>? = null
 
     @SerializedName("orgId")
     @Expose
@@ -93,4 +102,8 @@ class MediatorConnectionObject :Serializable{
     @SerializedName("state")
     @Expose
     var state: String? = null
+
+    @SerializedName("is_dexa_enabled")
+    @Expose
+    var isDexaEnabled: Boolean? = null
 }

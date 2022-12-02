@@ -7,6 +7,14 @@ import com.google.gson.annotations.SerializedName
 import java.io.Serializable
 
 open class Attributes :Serializable {
+    constructor() {
+
+    }
+
+    constructor(name: String, value: String) {
+        this.name = name
+        this.value = value
+    }
 
     @SerializedName("name")
     @Expose

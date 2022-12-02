@@ -3,7 +3,8 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bgColor">
+    android:background="@color/bgColor"
+    android:id="@+id/clView">
 
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/toolbar"
@@ -13,64 +14,213 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:titleTextColor="@color/Black"
-        app:theme="@style/ThemeOverlay.AppCompat.ActionBar"/>
+        app:theme="@style/ThemeOverlay.AppCompat.ActionBar" />
 
-    <TextView
-        android:id="@+id/tvDesc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="20dp"
-        android:layout_marginEnd="20dp"
-        android:layout_marginTop="20dp"
-        android:justificationMode="inter_word"
-        android:text="@string/txt_certificates_desc"
-        android:textColor="@color/textColor"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/toolbar" />
-
-    <TextView
-        android:id="@+id/tvHead"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:text=""
-        android:textColor="@color/textColor"
-        android:textStyle="bold"
-        app:layout_constraintStart_toStartOf="@+id/tvDesc"
-        app:layout_constraintTop_toBottomOf="@+id/tvDesc" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/rvAttributes"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="10dp"
+        app:layout_constraintBottom_toTopOf="@+id/btAccept"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/toolbar">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cvLogo"
+                android:layout_width="60dp"
+                android:layout_height="60dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                app:cardBackgroundColor="@color/white"
+                app:cardCornerRadius="50dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageView
+                    android:id="@+id/ivLogo"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:contentDescription="@string/connection_logo"
+                    android:src="@drawable/images" />
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:id="@+id/tvOrgName"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:justificationMode="inter_word"
+                android:text=""
+                android:textColor="@color/Black"
+                android:textSize="@dimen/text_size_normal"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toTopOf="@+id/tvLocation"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/cvLogo"
+                app:layout_constraintTop_toTopOf="@+id/cvLogo" />
+
+            <TextView
+                android:id="@+id/tvLocation"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginEnd="20dp"
+                android:justificationMode="inter_word"
+                android:text=""
+                android:textColor="@color/Black"
+                android:textSize="@dimen/text_size_medium"
+                app:layout_constraintBottom_toBottomOf="@+id/cvLogo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/cvLogo"
+                app:layout_constraintTop_toBottomOf="@+id/tvOrgName" />
+
+            <TextView
+                android:id="@+id/tvDesc"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginEnd="20dp"
+                android:justificationMode="inter_word"
+                android:text="@string/scan_you_requested_the_following_data_to_be_issued_by_choosing_accept_you_agree_to_add_the_data_to_your_data_wallet"
+                android:textColor="@color/textColor"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cvLogo" />
+
+            <TextView
+                android:id="@+id/tvHead"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:text=""
+                android:textAlignment="viewStart"
+                android:textSize="@dimen/text_size_normal"
+                android:textColor="@color/textColorLight"
+                app:layout_constraintEnd_toStartOf="@+id/ivCard"
+                app:layout_constraintStart_toStartOf="@+id/tvDesc"
+                app:layout_constraintTop_toBottomOf="@+id/tvDesc" />
+
+            <ImageView
+                android:id="@+id/ivCard"
+                android:layout_width="wrap_content"
+                android:layout_height="40dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:src="@drawable/ic_credit_card_24"
+                app:layout_constraintBottom_toTopOf="@+id/vpAttributes"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <androidx.viewpager2.widget.ViewPager2
+                android:id="@+id/vpAttributes"
+                android:layout_width="match_parent"
+                android:layout_height="0dp"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:layout_marginBottom="10dp"
+                app:layout_constraintBottom_toTopOf="@+id/dotsIndicator"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvHead" />
+
+            <com.tbuonomo.viewpagerdotsindicator.DotsIndicator
+                android:id="@+id/dotsIndicator"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="20dp"
+                app:dotsColor="@color/lightBorderColor"
+                app:dotsCornerRadius="8dp"
+                app:dotsSize="8dp"
+                app:dotsSpacing="4dp"
+                app:dotsWidthFactor="1"
+                app:layout_constraintBottom_toTopOf="@+id/clAgreement"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:progressMode="false"
+                app:selectedDotColor="@color/black" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/clAgreement"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginEnd="20dp"
+                android:visibility="visible"
+                android:background="@drawable/primary_background"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/dotsIndicator">
+
+                <TextView
+                    android:id="@+id/tvAgreement"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/primary_background"
+                    android:padding="10dp"
+                    android:text="@string/certificate_data_agreement_policy"
+                    android:textAlignment="viewStart"
+                    android:textColor="@color/textColorVeryLight"
+                    android:textSize="@dimen/text_size_normal"
+                    android:visibility="visible"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <ImageView
+                    android:id="@+id/ivDataAgreement"
+                    android:layout_width="@dimen/forward_arrow_width"
+                    android:layout_height="@dimen/forward_arrow_height"
+                    android:src="@drawable/ic_arrow_forward"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    android:padding="@dimen/forward_arrow_padding"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/clAgreement" />
+
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="20dp"
+        android:background="@drawable/bg_gradient"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/tvMultipleData"/>
+
+    <TextView
+        android:id="@+id/tvMultipleData"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
         android:layout_marginStart="20dp"
         android:layout_marginEnd="20dp"
-        android:background="@drawable/primary_background"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/tvHead" />
+        android:paddingBottom="20dp"
+        android:justificationMode="inter_word"
+        android:text="@string/cards_multiple_data_cards_found_choose_the_right_card_and_data_to_exchange"
+        android:textAlignment="center"
+        android:textColor="@color/textColorLight"
+        android:visibility="gone"
+        android:background="@color/bgColor"
+        app:layout_constraintBottom_toTopOf="@+id/btAccept"
+        app:layout_constraintStart_toStartOf="parent" />
 
-<!--    <Button-->
-<!--        android:id="@+id/btReject"-->
-<!--        android:layout_width="150dp"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_marginBottom="10dp"-->
-<!--        android:background="@drawable/secondary_button_background"-->
-<!--        android:enabled="true"-->
-<!--        android:text="@string/txt_reject"-->
-<!--        android:textColor="@color/white"-->
-<!--        app:layout_constraintBottom_toBottomOf="parent"-->
-<!--        app:layout_constraintEnd_toStartOf="@+id/btAccept"-->
-<!--        app:layout_constraintStart_toStartOf="parent" />-->
-
-    <Button
+    <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btAccept"
         android:layout_width="250dp"
         android:layout_height="wrap_content"
         android:layout_marginBottom="10dp"
         android:background="@drawable/primary_button_background"
         android:enabled="true"
-        android:text="@string/txt_exchange"
+        android:text="@string/general_confirm"
         android:textColor="@color/white"
         android:textAllCaps="false"
         app:layout_constraintEnd_toEndOf="parent"

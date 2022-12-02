@@ -27,22 +27,34 @@
             <ImageView
                 android:id="@+id/ivLogo"
                 android:layout_width="70dp"
-                android:contentDescription="@string/txt_logo"
+                android:contentDescription="@string/connection_logo"
                 android:layout_height="70dp"
                 android:src="@drawable/images" />
         </androidx.cardview.widget.CardView>
 
         <TextView
             android:id="@+id/tvName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:padding="3dp"
             android:textColor="@color/Black"
             android:textSize="16dp"
             android:layout_marginStart="10dp"
+            android:layout_marginEnd="5dp"
             android:text="text"
             app:layout_constraintStart_toEndOf="@+id/cvLogo"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintEnd_toStartOf="@+id/vDot"/>
+
+        <View
+            android:layout_width="10dp"
+            android:layout_height="10dp"
+            android:background="@drawable/notification_dot"
+            android:id="@+id/vDot"
+            app:layout_constraintTop_toTopOf="@+id/tvName"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toBottomOf="@id/tvName"
+            android:layout_marginEnd="5dp"/>
 
         <TextView
             android:id="@+id/tvType"
@@ -65,14 +77,14 @@
             android:text=""
             app:layout_constraintStart_toStartOf="@id/tvName"
             app:layout_constraintTop_toBottomOf="@+id/tvType" />
-<!--        <ImageView-->
-<!--            android:id="@+id/ivAdd"-->
-<!--            android:layout_width="30dp"-->
-<!--            android:layout_height="30dp"-->
-<!--            app:layout_constraintEnd_toEndOf="parent"-->
-<!--            app:layout_constraintTop_toTopOf="parent"-->
-<!--            app:layout_constraintBottom_toBottomOf="parent"-->
-<!--            android:src="@drawable/ic_add"/>-->
+        <!--        <ImageView-->
+        <!--            android:id="@+id/ivAdd"-->
+        <!--            android:layout_width="30dp"-->
+        <!--            android:layout_height="30dp"-->
+        <!--            app:layout_constraintEnd_toEndOf="parent"-->
+        <!--            app:layout_constraintTop_toTopOf="parent"-->
+        <!--            app:layout_constraintBottom_toBottomOf="parent"-->
+        <!--            android:src="@drawable/ic_add"/>-->
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.cardview.widget.CardView>

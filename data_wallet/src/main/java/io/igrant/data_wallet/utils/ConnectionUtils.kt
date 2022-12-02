@@ -8,12 +8,22 @@ import io.igrant.data_wallet.activity.ProposeAndExchangeDataActivity
 import io.igrant.data_wallet.indy.WalletManager
 import io.igrant.data_wallet.models.MediatorConnectionObject
 import io.igrant.data_wallet.models.agentConfig.Invitation
+import io.igrant.data_wallet.models.presentationExchange.PresentationExchange
+import io.igrant.data_wallet.models.presentationExchange.PresentationRequest
 import io.igrant.data_wallet.models.walletSearch.SearchResponse
 import org.hyperledger.indy.sdk.non_secrets.WalletSearch
 import org.json.JSONObject
 
 object ConnectionUtils {
 
+    /**
+     * check if the url contains igrant valid urls
+     */
+    fun isIGrnatValidUrl(url:String):Boolean{
+        return (url.contains("datawallet.page.link") ||
+                url.contains("igrant.page.link")||
+                url.contains("cloudagent.igrant.io") )
+    }
     /**
      * to check whether the connection already existing with the invitation key
      */
@@ -87,7 +97,7 @@ object ConnectionUtils {
     fun saveConnectionAndExchangeData(
         context: Context,
         data: String,
-        proofRequest: JSONObject,
+        proofRequest: JSONObject?,
         qrId: String
     ) {
         var invitation: Invitation? = null
@@ -102,23 +112,55 @@ object ConnectionUtils {
         } catch (e: Exception) {
         }
         if (invitation != null)
-            sendProposal(context,proofRequest, invitation, qrId)
-//        else
-//            Toast.makeText(
-//                context,
-//                resources.getString(R.string.err_unexpected),
-//                Toast.LENGTH_SHORT
-//            ).show()
+            sendProposal(context, proofRequest, invitation, qrId)
+    }
+
+    fun saveConnectionAndExchangeData(
+        context: Context,
+        invitation: Invitation?,
+        proofRequest: PresentationRequest?,
+        qrId: String,
+        presentationExchange: PresentationExchange
+    ) {
+        if (invitation != null)
+            sendProposal(context, proofRequest, invitation, qrId, presentationExchange)
     }
 
     private fun sendProposal(
         context: Context,
-        proofRequest: JSONObject,
+        proofRequest: PresentationRequest?,
+        invitation: Invitation,
+        qrId: String,
+        presentationExchange: PresentationExchange?
+    ) {
+        val intent = Intent(context, ProposeAndExchangeDataActivity::class.java)
+        if (proofRequest != null)
+            intent.putExtra(
+                ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_PROPOSAL,
+                WalletManager.getGson.toJson(proofRequest)
+            )
+        if (presentationExchange != null)
+            intent.putExtra(
+                ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_EXCHANGE,
+                presentationExchange
+            )
+        intent.putExtra(ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_INVITATION, invitation)
+        intent.putExtra(ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_QR_ID, qrId)
+        context.startActivity(intent)
+    }
+
+    private fun sendProposal(
+        context: Context,
+        proofRequest: JSONObject?,
         invitation: Invitation,
         qrId: String
     ) {
         val intent = Intent(context, ProposeAndExchangeDataActivity::class.java)
-        intent.putExtra(ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_PROPOSAL, proofRequest.toString())
+        if (proofRequest != null)
+            intent.putExtra(
+                ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_PROPOSAL,
+                proofRequest.toString()
+            )
         intent.putExtra(ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_INVITATION, invitation)
         intent.putExtra(ProposeAndExchangeDataActivity.EXTRA_PRESENTATION_QR_ID, qrId)
         context.startActivity(intent)

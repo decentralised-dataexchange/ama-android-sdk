@@ -23,4 +23,8 @@ class DidDoc {
     @SerializedName("service")
     @Expose
     var service: ArrayList<Service>? = null
+
+    @SerializedName("verification_method")
+    @Expose
+    var verificationMethod: ArrayList<VerificationMethod>? = null
 }

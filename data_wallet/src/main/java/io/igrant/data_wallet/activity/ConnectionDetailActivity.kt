@@ -11,11 +11,14 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.Toolbar
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.google.gson.Gson
 import io.igrant.data_wallet.R
+import io.igrant.data_wallet.activity.HistoryActivity.Companion.EXTRA_ORG_ID
 import io.igrant.data_wallet.adapter.ConnectionMessageAdapter
 import io.igrant.data_wallet.communication.ApiManager
 import io.igrant.data_wallet.events.ReceiveOfferEvent
@@ -25,13 +28,16 @@ import io.igrant.data_wallet.models.MediatorConnectionObject
 import io.igrant.data_wallet.models.Notification
 import io.igrant.data_wallet.models.agentConfig.ConfigPostResponse
 import io.igrant.data_wallet.models.certificateOffer.Attributes
-import io.igrant.data_wallet.models.connection.Certificate
-import io.igrant.data_wallet.models.connection.Connection
-import io.igrant.data_wallet.models.connection.ConnectionCerListResponse
+import io.igrant.data_wallet.models.connection.*
 import io.igrant.data_wallet.models.connectionRequest.DidDoc
 import io.igrant.data_wallet.models.credentialExchange.RawCredential
 import io.igrant.data_wallet.models.walletSearch.Record
+import io.igrant.data_wallet.tags.TagDataShareHistory
 import io.igrant.data_wallet.utils.*
+import io.igrant.data_wallet.utils.ConnectionDetail.getV2ConnectionDetail
+import io.igrant.data_wallet.utils.ConnectionTypes.EBSI_CONNECTION_NATURAL_PERSON
+import io.igrant.data_wallet.utils.ConnectionTypes.IGRANT_ENABLED_CONNECTION
+import io.igrant.data_wallet.utils.ConnectionTypes.V2_CONNECTION
 import io.igrant.data_wallet.utils.WalletRecordType.Companion.CONNECTION
 import io.igrant.data_wallet.utils.WalletRecordType.Companion.DID_DOC
 import okhttp3.MediaType
@@ -51,15 +57,10 @@ import java.io.IOException
 
 class ConnectionDetailActivity : BaseActivity() {
 
+    private var orgId: String? = null
     private var connectionCertList: ConnectionCerListResponse? = null
     private var mConnectionId: String = ""
 
-    private lateinit var connectionMessageAdapter: ConnectionMessageAdapter
-    private var connectionMessageList: ArrayList<Record> = ArrayList()
-    private var dataCertificateTypes: ArrayList<Certificate> = ArrayList()
-
-    //views
-    private lateinit var rvConnectionMessages: RecyclerView
     private lateinit var llErrorMessage: LinearLayout
     private lateinit var ivCoverUrl: ImageView
     private lateinit var ivLogo: ImageView
@@ -67,6 +68,9 @@ class ConnectionDetailActivity : BaseActivity() {
     private lateinit var tvLocation: TextView
     private lateinit var tvDescription: TextView
     private lateinit var tvRemove: TextView
+    private lateinit var tvMySharedData: TextView
+    private lateinit var tv3ppDataSharing: TextView
+    private lateinit var llProgressBar: LinearLayout
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -76,24 +80,66 @@ class ConnectionDetailActivity : BaseActivity() {
         setUpToolbar()
         initListener()
         checkIfIgrantSupportedConnection()
-        setUpAdapter()
-        setUpConnectionMessagesList()
     }
 
     private fun checkIfIgrantSupportedConnection() {
 
         val connection = SearchUtils.searchWallet(CONNECTION, "{\"request_id\":\"$mConnectionId\"}")
 
-        if (connection.totalCount ?: 0 > 0) {
+        if ((connection.totalCount ?: 0) > 0) {
             val connectionObject = WalletManager.getGson.fromJson(
                 connection.records?.get(0)?.value ?: "",
                 MediatorConnectionObject::class.java
             )
 
-            if (connectionObject.isIGrantEnabled == true) {
-                getConnectionDetail(connectionObject)
-            } else {
-                setDefaultValues(connectionObject)
+            val connectionType = AnalyseProtocol.checkConnectionType(connectionObject.protocols)
+            when {
+                connectionType == IGRANT_ENABLED_CONNECTION ||
+                        connectionObject.isIGrantEnabled == true -> {
+                    getConnectionDetail(connectionObject)
+                }
+                connectionType == V2_CONNECTION -> {
+                    val didDoc =
+                        SearchUtils.searchWallet(
+                            DID_DOC,
+                            "{\"did\":\"${connectionObject.theirDid}\"}"
+                        )
+
+                    if ((didDoc.totalCount ?: 0) > 0) {
+                        val didDocObj = WalletManager.getGson.fromJson(
+                            didDoc.records?.get(0)?.value,
+                            DidDoc::class.java
+                        )
+                        getV2ConnectionDetail(connectionObject.myDid ?: "",
+                            connectionObject.theirDid ?: "",
+                            didDocObj,
+                            object : ConnectionDetailCompletionListener {
+                                override fun onSuccess(connection: ConnectionV2Response) {
+                                    super.onSuccess(connection)
+                                    initDataValues(connection.body)
+                                }
+
+                                override fun onFailure() {
+                                    super.onFailure()
+                                    setDefaultValues(connectionObject)
+                                }
+                            })
+                    }
+                }
+                connectionObject.connectionType == EBSI_CONNECTION_NATURAL_PERSON -> {
+                    initDataValues(
+                        Connection(
+                            orgId = connectionObject.orgId,
+                            logoImageUrl = connectionObject.theirImageUrl,
+                            description = "EBSI is a joint initiative from the European Commission and the European Blockchain Partnership. The vision is to leverage blockchain to accelerate the creation of cross-border services for public administrations and their ecosystems to verify information and to make services more trustworthy.",
+                            name = connectionObject.theirLabel,
+                            location = connectionObject.location
+                        )
+                    )
+                }
+                else -> {
+                    setDefaultValues(connectionObject)
+                }
             }
         }
     }
@@ -108,214 +154,137 @@ class ConnectionDetailActivity : BaseActivity() {
 
         tvName.text = connectionObject.theirLabel ?: ""
         tvLocation.text = connectionObject.location ?: ""
+        llProgressBar.visibility = View.GONE
     }
 
     private fun getConnectionDetail(connectionObject: MediatorConnectionObject) {
         val orgData =
-                "{ \"@type\": \"${DidCommPrefixUtils.getType(DidCommPrefixUtils.IGRANT_OPERATOR)}/igrantio-operator/1.0/organization-info\", \"@id\": \"$mConnectionId\" , \"~transport\": {" +
+            "{ \"@type\": \"${DidCommPrefixUtils.getType(DidCommPrefixUtils.IGRANT_OPERATOR)}/igrantio-operator/1.0/organization-info\", \"@id\": \"$mConnectionId\" , \"~transport\": {" +
                     "\"return_route\": \"all\"}\n}"
-
-        val cerData =
-                "{ \"@type\": \"${DidCommPrefixUtils.getType(DidCommPrefixUtils.IGRANT_OPERATOR)}/igrantio-operator/1.0/list-data-certificate-types\", \"@id\": \"$mConnectionId\" , \"~transport\": {" +
-                    "\"return_route\": \"all\"}\n}"
+//
+//        val cerData =
+//            "{ \"@type\": \"${DidCommPrefixUtils.getType(DidCommPrefixUtils.IGRANT_OPERATOR)}/igrantio-operator/1.0/list-data-certificate-types\", \"@id\": \"$mConnectionId\" , \"~transport\": {" +
+//                    "\"return_route\": \"all\"}\n}"
 
         val didDoc =
             SearchUtils.searchWallet(DID_DOC, "{\"did\":\"${connectionObject.theirDid}\"}")
 
-        if (didDoc.totalCount ?: 0 > 0) {
+        if ((didDoc.totalCount ?: 0) > 0) {
             val didDocObj = WalletManager.getGson.fromJson(
                 didDoc.records?.get(0)?.value,
                 DidDoc::class.java
             )
 
             val serviceEndPoint = didDocObj.service?.get(0)?.serviceEndpoint ?: ""
-//                val publicKey = didDocObj.publicKey?.get(0)?.publicKeyBase58
 
-            val metaString =
-                Did.getDidWithMeta(WalletManager.getWallet, connectionObject.myDid).get()
-            val metaObject = JSONObject(metaString)
-            val key = metaObject.getString("verkey")
+            if (WalletManager.getWallet != null) {
+                val metaString =
+                    Did.getDidWithMeta(WalletManager.getWallet, connectionObject.myDid).get()
+                val metaObject = JSONObject(metaString)
+                val key = metaObject.getString("verkey")
 
-            val orgDetailPacked = PackingUtils.packMessage(didDocObj, key, orgData,"")
+                val orgDetailPacked = PackingUtils.packMessage(didDocObj, key, orgData, "")
 
-            val orgDetailTypedArray = object : RequestBody() {
-                override fun contentType(): MediaType? {
-                    return "application/ssi-agent-wire".toMediaTypeOrNull()
-                }
-
-                @Throws(IOException::class)
-                override fun writeTo(sink: BufferedSink) {
-                    sink.write(orgDetailPacked)
-                }
-            }
-            ApiManager.api.getService()?.postData(serviceEndPoint, orgDetailTypedArray)
-                ?.enqueue(object :
-                    Callback<ConfigPostResponse> {
-                    override fun onFailure(call: Call<ConfigPostResponse>, t: Throwable) {
-                        Log.d("https", "onFailure: ")
+                val orgDetailTypedArray = object : RequestBody() {
+                    override fun contentType(): MediaType? {
+                        return "application/ssi-agent-wire".toMediaTypeOrNull()
                     }
 
-                    override fun onResponse(
-                        call: Call<ConfigPostResponse>,
-                        response: Response<ConfigPostResponse>
-                    ) {
-                        if (response.code() == 200 && response.body() != null) {
-                            val unpack =
-                                Crypto.unpackMessage(
-                                    WalletManager.getWallet,
-                                    WalletManager.getGson.toJson(response.body()).toString()
-                                        .toByteArray()
-                                ).get()
-
-                            Log.d(
-                                "milan",
-                                "onResponse: ${JSONObject(String(unpack)).getString("message")}"
-                            )
-                            val connectionData = WalletManager.getGson.fromJson(
-                                JSONObject(String(unpack)).getString("message"),
-                                Connection::class.java
-                            )
-                            initDataValues(connectionData)
+                    @Throws(IOException::class)
+                    override fun writeTo(sink: BufferedSink) {
+                        sink.write(orgDetailPacked)
+                    }
+                }
+                ApiManager.api.getService()?.postData(serviceEndPoint, orgDetailTypedArray)
+                    ?.enqueue(object :
+                        Callback<ConfigPostResponse> {
+                        override fun onFailure(call: Call<ConfigPostResponse>, t: Throwable) {
+                            Log.d("https", "onFailure: ")
                         }
-                    }
-                })
 
-            val orgCerListPacked = PackingUtils.packMessage(didDocObj, key, cerData,"")
+                        override fun onResponse(
+                            call: Call<ConfigPostResponse>,
+                            response: Response<ConfigPostResponse>
+                        ) {
+                            if (response.code() == 200 && response.body() != null) {
+                                val unpack =
+                                    Crypto.unpackMessage(
+                                        WalletManager.getWallet,
+                                        WalletManager.getGson.toJson(response.body()).toString()
+                                            .toByteArray()
+                                    ).get()
 
-            val orgCerListTypedArray = object : RequestBody() {
-                override fun contentType(): MediaType? {
-                    return "application/ssi-agent-wire".toMediaTypeOrNull()
-                }
-
-                @Throws(IOException::class)
-                override fun writeTo(sink: BufferedSink) {
-                    sink.write(orgCerListPacked)
-                }
-            }
-            ApiManager.api.getService()?.postData(serviceEndPoint, orgCerListTypedArray)
-                ?.enqueue(object :
-                    Callback<ConfigPostResponse> {
-                    override fun onFailure(call: Call<ConfigPostResponse>, t: Throwable) {
-                        Log.d("https", "onFailure: ")
-                    }
-
-                    override fun onResponse(
-                        call: Call<ConfigPostResponse>,
-                        response: Response<ConfigPostResponse>
-                    ) {
-                        if (response.code() == 200 && response.body() != null) {
-                            val unpack =
-                                Crypto.unpackMessage(
-                                    WalletManager.getWallet,
-                                    WalletManager.getGson.toJson(response.body()).toString()
-                                        .toByteArray()
-                                ).get()
-
-                            Log.d(
-                                "milan",
-                                "onResponse: ${JSONObject(String(unpack)).getString("message")}"
-                            )
-                            val certificateList = WalletManager.getGson.fromJson(
-                                JSONObject(String(unpack)).getString("message"),
-                                ConnectionCerListResponse::class.java
-                            )
-                            connectionCertList = certificateList
-                            initList()
+                                Log.d(
+                                    "milan",
+                                    "onResponse: ${JSONObject(String(unpack)).getString("message")}"
+                                )
+                                val connectionData = WalletManager.getGson.fromJson(
+                                    JSONObject(String(unpack)).getString("message"),
+                                    Connection::class.java
+                                )
+                                initDataValues(connectionData)
+                            }
                         }
-                    }
-                })
-        }
-    }
-
-    private fun initList() {
-        val tempList: ArrayList<Certificate> = ArrayList()
-        var tempCer: Certificate
-        for (certificate in connectionCertList?.dataCertificateTypes ?: ArrayList()) {
-            tempCer = certificate
-            for (cer in connectionMessageList) {
-                val gson = Gson()
-                val notification = gson.fromJson(cer.value, Notification::class.java)
-                val message = notification.certificateOffer
-
-                val schema = gson.fromJson(
-                    Base64.decode(message?.offersAttach?.get(0)?.data?.base64, Base64.URL_SAFE)
-                        .toString(charset("UTF-8")), RawCredential::class.java
-                ).schemaId
-
-                if (certificate.schemaId == schema ?: "") {
-                    tempCer.record = cer
-                }
+                    })
             }
-
-//            val walletModelTag = "{" +
-//                    "\"connection_id\":\"${mConnectionId}\"," +
-//                    "\"schema_id\":\"${certificate.schemaId ?: ""}\"" +
-//                    "}"
-
-//            val walletSearch = SearchUtils.searchWallet(WalletRecordType.WALLET, walletModelTag)
-
-
-//            if (walletSearch.records != null && walletSearch.totalCount ?: 0 > 0) {
-//                try {
-//                    val certificate =
-//                        WalletManager.getGson.fromJson(
-//                            walletSearch.records!![0].value,
-//                            WalletModel::class.java
-//                        )
-//                    tempCer.attributeList =
-//                        certificate.credentialProposalDict?.credentialProposal?.attributes!!
-//                } catch (e: Exception) {
-//                }
-//            } else {
-            var attributeList: ArrayList<Attributes> = ArrayList()
-            var attribute: Attributes
-            for (string in certificate.schemaAttributes) {
-                attribute = Attributes()
-                attribute.name = string
-                attribute.value = ""
-
-                attributeList.add(attribute)
-            }
-            tempCer.attributeList = attributeList
-//            }
-
-            tempList.add(tempCer)
         }
-
-        dataCertificateTypes.clear()
-        dataCertificateTypes.addAll(tempList)
-        llErrorMessage.visibility = if (dataCertificateTypes.size > 0) View.GONE else View.VISIBLE
-        connectionMessageAdapter.notifyDataSetChanged()
     }
 
     private fun initDataValues(connectionData: Connection?) {
+        initDataValues(
+            connectionData?.orgId,
+            connectionData?.logoImageUrl,
+            connectionData?.coverImageUrl,
+            connectionData?.description,
+            connectionData?.name,
+            connectionData?.location
+        )
+    }
+
+    private fun initDataValues(connectionData: ConnectionV2?) {
+        initDataValues(
+            connectionData?.organisationId ?:connectionData?.organisationDid,
+            connectionData?.logoImageUrl,
+            connectionData?.coverImageUrl,
+            connectionData?.description,
+            connectionData?.organisationName,
+            connectionData?.location
+        )
+    }
+
+    private fun initDataValues(
+        mOrgId: String?,
+        logoImageUrl: String?,
+        coverImageUrl: String?,
+        desc: String?,
+        title: String?,
+        location: String?
+    ) {
+        orgId = mOrgId
         Glide
             .with(ivLogo.context)
-            .load(connectionData?.logoImageUrl)
+            .load(logoImageUrl)
             .centerCrop()
             .placeholder(R.drawable.images)
             .into(ivLogo)
 
         Glide
             .with(ivCoverUrl.context)
-            .load(connectionData?.coverImageUrl)
+            .load(coverImageUrl)
             .centerCrop()
             .placeholder(R.drawable.default_cover_image)
             .into(ivCoverUrl)
 
-        tvDescription.text = connectionData?.description
-        TextUtils.makeTextViewResizable(
-            tvDescription,
-            3,
-            resources.getString(R.string.txt_read_more),
-            true
-        );
-        tvName.text = connectionData?.name
-        tvLocation.text = connectionData?.location
+        tvDescription.text = desc
+
+        tvName.text = title
+        tvLocation.text = location
+        llProgressBar.visibility = View.GONE
+
+        update3ppButton()
     }
 
     private fun initViews() {
-        rvConnectionMessages = findViewById(R.id.rvConnectionMessages)
         llErrorMessage = findViewById(R.id.llErrorMessage)
         ivCoverUrl = findViewById(R.id.ivCoverUrl)
         ivLogo = findViewById(R.id.ivLogo)
@@ -323,6 +292,9 @@ class ConnectionDetailActivity : BaseActivity() {
         tvLocation = findViewById(R.id.tvLocation)
         tvDescription = findViewById(R.id.tvDescription)
         tvRemove = findViewById(R.id.tvRemove)
+        tvMySharedData = findViewById(R.id.tvMySharedData)
+        tv3ppDataSharing = findViewById(R.id.tv3ppDataSharing)
+        llProgressBar = findViewById(R.id.llProgressBar)
     }
 
     private fun getIntentData() {
@@ -353,70 +325,79 @@ class ConnectionDetailActivity : BaseActivity() {
 
     private fun initListener() {
         tvRemove.setOnClickListener {
-            DeleteUtils.deleteConnection(mConnectionId)
-            finish()
-        }
-    }
-
-    private fun setUpAdapter() {
-        connectionMessageAdapter =
-            ConnectionMessageAdapter(dataCertificateTypes, object : ConnectionMessageListener {
-                override fun onConnectionMessageClick(record: Record, name: String) {
-                    val intent =
-                        Intent(this@ConnectionDetailActivity, OfferCertificateActivity::class.java)
-                    intent.putExtra(
-                        OfferCertificateActivity.EXTRA_CERTIFICATE_PREVIEW,
-                        record
-                    )
-                    startActivity(intent)
-                    Handler(Looper.getMainLooper()).postDelayed({
+            if (WalletManager.getWallet != null) {
+                AlertDialog.Builder(this)
+                    .setTitle(resources.getString(R.string.general_app_title))
+                    .setMessage(
+                        resources.getString(
+                            R.string.data_do_you_want_to_remove_the_organisation
+                        )
+                    ) // Specifying a listener allows you to take an action before dismissing the dialog.
+                    // The dialog is automatically dismissed when a dialog button is clicked.
+                    .setPositiveButton(
+                        R.string.general_yes
+                    ) { dialog, which ->
+                        DeleteUtils.deleteConnection(mConnectionId)
                         finish()
-                    }, 100)
+                    } // A null listener allows the button to dismiss the dialog and take no further action.
+                    .setNegativeButton(
+                        R.string.general_no
+                    ) { dialog, which ->
 
-                }
+                    }
+                    .show()
+            }
 
-            })
-        rvConnectionMessages.adapter = connectionMessageAdapter
+        }
+
+        tvMySharedData.setOnClickListener {
+            if (orgId != null) {
+                val intent = Intent(this, HistoryActivity::class.java)
+                intent.putExtra(EXTRA_ORG_ID, orgId)
+                startActivity(intent)
+            }
+        }
+
+        tv3ppDataSharing.setOnClickListener {
+            if (orgId != null) {
+                val intent = Intent(this, ThirdPartyDataSharingActivity::class.java)
+                intent.putExtra(ThirdPartyDataSharingActivity.EXTRA_ORG_ID, orgId)
+                startActivity(intent)
+            }
+        }
     }
 
-    private fun setUpConnectionMessagesList() {
-        val connectionMessageResponse =
-            SearchUtils.searchWallet(
-                WalletRecordType.MESSAGE_RECORDS,
-                "{\"connectionId\": \"${mConnectionId}\"," +
-                        "\"type\":\"${MessageTypes.TYPE_OFFER_CREDENTIAL}\",\n" +
-                        "\"stat\":\"Active\"\n" +
-                        "}"
+    private fun update3ppButton() {
+        if (orgId != null) {
+            val query = TagDataShareHistory(
+                orgId = orgId,
+                thirdParty = "true"
             )
-        if (connectionMessageResponse.totalCount ?: 0 > 0) {
-            connectionMessageList.clear()
-            connectionMessageList.addAll(connectionMessageResponse.records ?: ArrayList())
+            val searchResponse = SearchUtils.searchWallet(
+                WalletRecordType.DATA_HISTORY,
+                WalletManager.getGson.toJson(query)
+            )
+            if ((searchResponse.totalCount ?: 0) > 0) {
+                enableDisableButton(tv3ppDataSharing, true)
+            } else {
+                enableDisableButton(tv3ppDataSharing, false)
+            }
+
+        } else {
+            enableDisableButton(tv3ppDataSharing, false)
         }
     }
 
-    @Subscribe(threadMode = ThreadMode.MAIN)
-    fun onConnectionSuccessEvent(event: ReceiveOfferEvent) {
-        setUpConnectionMessagesList()
-        if (connectionCertList != null)
-            initList()
+    private fun enableDisableButton(view: TextView, enable: Boolean) {
+        view.setTextColor(
+            if (!enable
+            ) ContextCompat.getColor(
+                this@ConnectionDetailActivity,
+                R.color.textColorVeryLight
+            ) else ContextCompat.getColor(this@ConnectionDetailActivity, R.color.textColor)
+        )
+        view.isEnabled = enable
     }
-
-    override fun onStart() {
-        try {
-            EventBus.getDefault().register(this)
-        } catch (e: Exception) {
-        }
-        super.onStart()
-    }
-
-    override fun onStop() {
-        try {
-            EventBus.getDefault().unregister(this)
-        } catch (e: Exception) {
-        }
-        super.onStop()
-    }
-
 
     companion object {
         const val EXTRA_CONNECTION_DATA =

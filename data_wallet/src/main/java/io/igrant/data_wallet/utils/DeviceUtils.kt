@@ -10,11 +10,11 @@ object DeviceUtils {
         return if (model.startsWith(manufacturer)) {
             capitalize(model)
         } else {
-           capitalize(manufacturer).toString() + " " + model
+            capitalize(manufacturer).toString() + " " + model
         }
     }
 
-    private fun capitalize(s: String?): String? {
+    fun capitalize(s: String?): String? {
         if (s == null || s.isEmpty()) {
             return ""
         }

@@ -45,7 +45,7 @@
                         android:id="@+id/ivLogo"
                         android:layout_width="80dp"
                         android:layout_height="80dp"
-                        android:contentDescription="@string/txt_logo"
+                        android:contentDescription="@string/connection_logo"
                         android:src="@drawable/images" />
                 </androidx.cardview.widget.CardView>
 
@@ -70,41 +70,41 @@
                     android:textColor="@color/textColor"
                     android:textSize="@dimen/text_size_medium" />
 
-                <LinearLayout
-                    android:id="@+id/llDescription"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                <!--                <LinearLayout-->
+                <!--                    android:id="@+id/llDescription"-->
+                <!--                    android:layout_width="match_parent"-->
+                <!--                    android:layout_height="wrap_content"-->
+                <!--                    android:orientation="vertical">-->
 
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_marginTop="10dp"
-                        android:text="@string/txt_org_overview"
-                        android:textAllCaps="true"
-                        android:textColor="@color/Black"
-                        android:textSize="@dimen/text_size_normal" />
+                <!--                    <TextView-->
+                <!--                        android:layout_width="wrap_content"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:layout_gravity="start"-->
+                <!--                        android:layout_marginTop="10dp"-->
+                <!--                        android:text="@string/txt_org_overview"-->
+                <!--                        android:textAllCaps="true"-->
+                <!--                        android:textColor="@color/Black"-->
+                <!--                        android:textSize="@dimen/text_size_normal" />-->
 
-                    <TextView
-                        android:id="@+id/tvDescription"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="start"
-                        android:layout_marginTop="5dp"
-                        android:justificationMode="inter_word"
-                        android:text="----------"
-                        android:textAlignment="viewStart"
-                        android:textColor="@color/textColor"
-                        android:textSize="@dimen/text_size_medium" />
-                </LinearLayout>
+                <!--                    <TextView-->
+                <!--                        android:id="@+id/tvDescription"-->
+                <!--                        android:layout_width="match_parent"-->
+                <!--                        android:layout_height="wrap_content"-->
+                <!--                        android:layout_gravity="start"-->
+                <!--                        android:layout_marginTop="5dp"-->
+                <!--                        android:justificationMode="inter_word"-->
+                <!--                        android:text="&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;&#45;"-->
+                <!--                        android:textAlignment="viewStart"-->
+                <!--                        android:textColor="@color/textColor"-->
+                <!--                        android:textSize="@dimen/text_size_medium" />-->
+                <!--                </LinearLayout>-->
 
                 <TextView
                     android:id="@+id/tvHead"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="10dp"
-                    android:text="@string/txt_certificates_head"
+                    android:text=""
                     android:textColor="@color/Black"
                     android:textStyle="bold" />
 
@@ -112,20 +112,21 @@
                     android:id="@+id/rvAttributes"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="10dp"
-                    android:background="@drawable/primary_background" />
+                    android:layout_marginTop="10dp" />
 
                 <TextView
                     android:id="@+id/tvRemove"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/primary_background"
-                    android:padding="10dp"
-                    android:text="@string/txt_remove_data_card"
+                    android:paddingStart="20dp"
+                    android:paddingTop="10dp"
+                    android:paddingBottom="10dp"
+                    android:paddingEnd="20dp"
+                    android:text="@string/data_remove_data_card"
                     android:textSize="@dimen/text_size_medium"
                     android:textColor="@color/red"
-                    android:layout_marginTop="10dp"
-                    android:gravity="center"/>
+                    android:gravity="start"/>
             </LinearLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

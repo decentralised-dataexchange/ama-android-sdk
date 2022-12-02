@@ -2,13 +2,24 @@ package io.igrant.data_wallet.models.presentationExchange
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import io.igrant.data_wallet.models.certificateOffer.DataAgreementContext
 import org.json.JSONObject
+import java.io.Serializable
+import java.util.*
 
-class PresentationExchange {
+class PresentationExchange():Serializable {
 
     @SerializedName("thread_id")
     @Expose
     var threadId: String? = ""
+
+    @SerializedName("~data-agreement-context")
+    @Expose
+    var dataAgreementContext: DataAgreementContext?=null
+
+    @SerializedName("qr_id")
+    @Expose
+    var qrId: String? = ""
 
     @SerializedName("created_at")
     @Expose

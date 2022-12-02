@@ -3,6 +3,7 @@ package io.igrant.data_wallet.models.credentialExchange
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import io.igrant.data_wallet.models.certificateOffer.OfferAttach
+import io.igrant.data_wallet.models.credentialExchange.Thread
 
 class IssueCredential {
 

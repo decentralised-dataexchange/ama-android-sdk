@@ -1,7 +1,9 @@
 package io.igrant.data_wallet.communication
 
+import io.igrant.data_wallet.models.LastUpdatedTimesResponse
 import io.igrant.data_wallet.models.agentConfig.ConfigPostResponse
 import io.igrant.data_wallet.models.agentConfig.ConfigResponse
+import io.igrant.data_wallet.models.ledger.Ledger
 import io.igrant.data_wallet.models.qr.QrDecode
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
@@ -15,6 +17,9 @@ interface APIService {
 
     @GET(".well-known/agent-configuration")
     fun getAgentConfig(): Call<ConfigResponse>
+
+    @GET("https://cloudagent-demo.igrant.io/v1/mydata-did-registry/admin/.well-known/did-configuration.json")
+    fun getRegistryConfig(): Call<ConfigResponse>
 
     @POST(" ")
     fun postDetails(@Body bytes:RequestBody ): Call<ResponseBody>
@@ -31,9 +36,19 @@ interface APIService {
     @POST
     fun postDataWithoutData(@Url url:String, @Body bytes:RequestBody): Call<ResponseBody>
 
+    @POST(" ")
+    fun postDetailsWithBody(@Body bytes: RequestBody): Call<ConfigPostResponse>
+
     @GET
     fun getGenesis(@Url url:String): Call<ResponseBody>
 
     @POST
     fun extractUrl(@Url url:String): Call<QrDecode>
+
+    @GET
+    fun getLastUpdatedTimes(@Url url: String): Call<LastUpdatedTimesResponse>
+
+    @GET
+    fun getLedger(@Url url: String): Call<ArrayList<Ledger>>
+
 }

@@ -4,8 +4,8 @@ object DidCommPrefixUtils {
 
     const val MEDIATOR = "mediator"
     const val IGRANT_OPERATOR = "igrant_operator"
-    private const val PREFIX_1 = "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec"
-    private const val PREFIX_2 = "https://didcomm.org"
+    const val PREFIX_1 = "did:sov:BzCbsNYhMrjHiqZDTUASHg;spec"
+    const val PREFIX_2 = "https://didcomm.org"
 
     fun getType():String{
         return PREFIX_1
