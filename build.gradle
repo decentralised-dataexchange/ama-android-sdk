@@ -17,22 +17,11 @@ buildscript {
 }
 
 allprojects {
-    def githubProperties = new Properties()
-    githubProperties.load(new FileInputStream(rootProject.file("github.properties")))
     repositories {
         google()
         jcenter()
         maven { url "https://jitpack.io" }
         maven { url 'https://repo.sovrin.org/repository/maven-public'}
-        maven {
-            name = "GitHubPackages"
-            url = uri("https://maven.pkg.github.com/L3-iGrant/qr-code-scanner-android")
-
-            credentials {
-                username = githubProperties['gpr.usr'] ?: System.getenv("GPR_USER")
-                password = githubProperties['gpr.key'] ?: System.getenv("GPR_API_KEY")
-            }
-        }
     }
 }
 

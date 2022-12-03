@@ -381,4 +381,21 @@
     <string name="general_false">False </string>
     <string name="data_agreement_policy_blink">Blink</string>
     <string name="data_agreement_policy_my_data_did">My Data DID</string>
+
+    //qr code
+    <string name="qc_code_close">Stäng</string>
+    <string name="qr_code_open_flash_light">Slå på ficklampa</string>
+    <string name="qr_code_close_flash_light">Slå av ficklampa</string>
+    <string name="qr_code_auto_scan_notification">Positionera QR-koden</string>
+    <string name="qr_code_notification">Meddelande</string>
+    <string name="qr_code_camera_not_open">Ingen åtkomst till kameran</string>
+    <string name="qr_code_positive_button_know">Ok</string>
+    <string name="qr_code_positive_button_confirm">Bekräfta</string>
+    <string name="qr_code_could_not_read_qr_code_from_picture">Kunde inte läsa av din bild. Försök med annan bild.</string>
+    <string name="qr_code_could_not_read_qr_code_from_scanner">Kunde inte öppna scannat innehåll</string>
+    <string name="qr_code_camera_not_found">Kunde inte hitta kamera</string>
+
+    <string name="txt_scan">Skanna</string>
+    <string name="txt_crop">Crop</string>
+    <string name="txt_apply">Apply</string>
 </resources>

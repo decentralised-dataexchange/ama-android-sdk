@@ -34,8 +34,10 @@
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_exchange_data.xml" value="0.22826086956521738" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_history.xml" value="0.1" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_history_detail.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_image_processing.xml" value="0.22826086956521738" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_initialize.xml" value="0.1" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_offer_certificate.xml" value="0.1" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_qr_code.xml" value="0.1" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_request.xml" value="0.22826086956521738" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/activity_third_party_data_sharing.xml" value="0.1" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/dailog_fragment_connection_progress.xml" value="0.1" />
@@ -54,6 +56,7 @@
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_third_party_data_sharing.xml" value="0.1" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_third_party_data_sharing_companies.xml" value="0.1" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/item_vaccination.xml" value="0.22826086956521738" />
+        <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/layout_qr_code_scanner.xml" value="0.1" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/layout/toast.xml" value="0.1" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/menu/menu_blur.xml" value="0.23802083333333332" />
         <entry key="..\:/Milan/iGrant/StudioProjects/Stable/ama-android-sdk/data_wallet/src/main/res/menu/menu_delete.xml" value="0.1" />

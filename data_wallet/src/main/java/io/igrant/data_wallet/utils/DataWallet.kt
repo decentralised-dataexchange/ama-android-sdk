@@ -7,6 +7,7 @@ import android.system.Os
 import android.util.Log
 import io.igrant.data_wallet.activity.ConnectionListActivity
 import io.igrant.data_wallet.activity.InitializeActivity
+import io.igrant.data_wallet.activity.RequestActivity
 import io.igrant.data_wallet.indy.LedgerNetworkType
 import io.igrant.data_wallet.indy.PoolManager
 import io.igrant.data_wallet.indy.WalletManager
@@ -58,6 +59,15 @@ object DataWallet {
 
         } else {
             val intent = Intent(context, ConnectionListActivity::class.java)
+            context.startActivity(intent)
+        }
+    }
+
+    fun showNotifications(context: Context) {
+        if (PoolManager.getPool == null) {
+
+        } else {
+            val intent = Intent(context, RequestActivity::class.java)
             context.startActivity(intent)
         }
     }

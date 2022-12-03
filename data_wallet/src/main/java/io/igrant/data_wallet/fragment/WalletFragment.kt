@@ -42,10 +42,10 @@ import io.igrant.data_wallet.models.agentConfig.Invitation
 import io.igrant.data_wallet.models.qr.QrDecode
 import io.igrant.data_wallet.models.wallet.WalletModel
 import io.igrant.data_wallet.models.walletSearch.Record
+import io.igrant.data_wallet.qrcode.utils.QRScanner
 import io.igrant.data_wallet.utils.*
 import io.igrant.data_wallet.utils.ConnectionUtils.saveConnectionAndExchangeData
 import io.igrant.data_wallet.utils.WalletRecordType.Companion.WALLET
-import io.igrant.qrcode_scanner_android.qrcode.utils.QRScanner
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
