@@ -381,4 +381,20 @@
     <string name="general_false">False </string>
     <string name="data_agreement_policy_blink">Blink</string>
     <string name="data_agreement_policy_my_data_did">My Data DID</string>
+
+    //qr code
+    <string name="qc_code_close">Close</string>
+    <string name="qr_code_open_flash_light">Turn on flash light</string>
+    <string name="qr_code_close_flash_light">Turn off flash light</string>
+    <string name="qr_code_auto_scan_notification">Position QR Code</string>
+    <string name="qr_code_notification">Notification</string>
+    <string name="qr_code_camera_not_open">Could not open your camera</string>
+    <string name="qr_code_positive_button_know">OK</string>
+    <string name="qr_code_positive_button_confirm">Confirm</string>
+    <string name="qr_code_could_not_read_qr_code_from_picture">Could not read your image.Try another image~</string>
+    <string name="qr_code_could_not_read_qr_code_from_scanner">Sorry, could not open scan content</string>
+    <string name="qr_code_camera_not_found">Could not detect camera</string>
+    <string name="txt_scan">Scan</string>
+    <string name="txt_crop">Crop</string>
+    <string name="txt_apply">Apply</string>
 </resources>

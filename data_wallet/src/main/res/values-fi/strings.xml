@@ -381,4 +381,21 @@
     <string name="general_false">False </string>
     <string name="data_agreement_policy_blink">Blink</string>
     <string name="data_agreement_policy_my_data_did">My Data DID</string>
+
+    //qr code
+    <string name="qc_code_close">sulje</string>
+    <string name="qr_code_open_flash_light">avaa taskulamppu</string>
+    <string name="qr_code_close_flash_light">sulje taskulamppu </string>
+    <string name="qr_code_auto_scan_notification">asemoi QR-koodi</string>
+    <string name="qr_code_notification">viesti</string>
+    <string name="qr_code_camera_not_open">kamera ei avaudu</string>
+    <string name="qr_code_positive_button_know">OK</string>
+    <string name="qr_code_positive_button_confirm">vahvista</string>
+    <string name="qr_code_could_not_read_qr_code_from_picture">Kuvaa ei voi lukea tai avata. Yritä uudelleen.</string>
+    <string name="qr_code_could_not_read_qr_code_from_scanner">Skannauksen avaaminen ei onnistunut. Yritä uudelleen.</string>
+    <string name="qr_code_camera_not_found">Kameran aktivointi ei onnistunut. Tarkista asetukset.</string>
+
+    <string name="txt_scan">Skannaa</string>
+    <string name="txt_crop">Crop</string>
+    <string name="txt_apply">Apply</string>
 </resources>

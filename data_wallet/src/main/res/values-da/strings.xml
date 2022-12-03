@@ -381,4 +381,21 @@
     <string name="general_false">False </string>
     <string name="data_agreement_policy_blink">Blink</string>
     <string name="data_agreement_policy_my_data_did">My Data DID</string>
+
+    //qr code
+    <string name="qc_code_close">Luk</string>
+    <string name="qr_code_open_flash_light">Tænd lommelygten</string>
+    <string name="qr_code_close_flash_light">Sluk lommelygten</string>
+    <string name="qr_code_auto_scan_notification">Scan QR kode</string>
+    <string name="qr_code_notification">Besked</string>
+    <string name="qr_code_camera_not_open">Kunne ikke åbne kamera</string>
+    <string name="qr_code_positive_button_know">OK</string>
+    <string name="qr_code_positive_button_confirm">Bekræft</string>
+    <string name="qr_code_could_not_read_qr_code_from_picture">Kunne ikke læse dit billede. Prøv igen.</string>
+    <string name="qr_code_could_not_read_qr_code_from_scanner">Kunne ikke åbne scannet indhold. Prøv igen.</string>
+    <string name="qr_code_camera_not_found">Kunne ikke aktivere kamera. Kontroller mobilens indstillinger.</string>
+
+    <string name="txt_scan">Scan</string>
+    <string name="txt_crop">Crop</string>
+    <string name="txt_apply">Apply</string>
 </resources>

@@ -45,5 +45,20 @@
 
         <activity android:name=".activity.HistoryDetailActivity"
             android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".activity.DataAgreementPolicyActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".activity.RequestActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".activity.ThirdPartyDataSharingActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".qrcode.ImageProcessingActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
+
+        <activity android:name=".qrcode.QRCSActivity"
+            android:theme="@style/AppTheme.NoActionBar"/>
     </application>
 </manifest>

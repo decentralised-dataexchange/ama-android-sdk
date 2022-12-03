@@ -7,7 +7,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.google.gms.google-services'
 
 group='com.github.decentralised-dataexchange'
-version = '1.12.1'
+version = '1.12.2'
 
 android {
     compileSdkVersion 32
@@ -16,8 +16,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 32
-        versionCode 3
-        versionName "1.12.1"
+        versionCode 4
+        versionName "1.12.2"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
@@ -62,6 +62,8 @@ dependencies {
     implementation 'com.squareup.okhttp3:logging-interceptor:4.3.1'
     implementation 'com.google.code.gson:gson:2.8.6'
 
+    implementation 'com.dlazaro66.qrcodereaderview:qrcodereaderview:2.0.3'
+
     implementation 'com.github.bumptech.glide:glide:4.11.0'
     annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 
@@ -76,10 +78,10 @@ dependencies {
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.5.2'
     implementation 'com.tbuonomo:dotsindicator:4.2'
 
-    implementation 'com.github.L3-iGrant:qrcode_scanner_android:2.7.1'
-
     implementation platform('com.google.firebase:firebase-bom:28.0.1')
     implementation 'com.google.firebase:firebase-dynamic-links-ktx'
+
+    implementation 'com.theartofdev.edmodo:android-image-cropper:2.8.0'
 }
 
 install {
@@ -150,6 +152,11 @@ install {
                     version '2.8.6'
                 }
                 dependency {
+                    groupId 'com.dlazaro66.qrcodereaderview'
+                    artifactId 'qrcodereaderview'
+                    version '2.0.3'
+                }
+                dependency {
                     groupId 'com.github.bumptech.glide'
                     artifactId 'glide'
                     version '4.11.0'
@@ -190,11 +197,6 @@ install {
                     version '4.2'
                 }
                 dependency {
-                    groupId 'com.github.L3-iGrant'
-                    artifactId 'qrcode_scanner_android'
-                    version '2.7.1'
-                }
-                dependency {
                     groupId 'com.google.firebase'
                     artifactId 'firebase-bom'
                     version '28.0.1'
@@ -202,6 +204,11 @@ install {
                 dependency {
                     groupId 'com.google.firebase'
                     artifactId 'firebase-dynamic-links-ktx'
+                }
+                dependency {
+                    groupId 'com.theartofdev.edmodo'
+                    artifactId 'android-image-cropper'
+                    version '2.8.0'
                 }
             }
         }

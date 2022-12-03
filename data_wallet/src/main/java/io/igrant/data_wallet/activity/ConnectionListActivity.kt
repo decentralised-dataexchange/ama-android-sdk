@@ -40,8 +40,8 @@ import io.igrant.data_wallet.fragment.FilterBottomSheetFragment
 import io.igrant.data_wallet.fragment.UrlExtractFragment
 import io.igrant.data_wallet.listeners.ConnectionFilterClickListener
 import io.igrant.data_wallet.models.ConnectionFilter
+import io.igrant.data_wallet.qrcode.utils.QRScanner
 import io.igrant.data_wallet.utils.*
-import io.igrant.qrcode_scanner_android.qrcode.utils.QRScanner
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode

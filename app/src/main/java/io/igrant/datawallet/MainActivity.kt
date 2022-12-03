@@ -19,6 +19,7 @@ class MainActivity : AppCompatActivity() {
 
         val wallet = findViewById<Button>(R.id.wallet)
         val connections = findViewById<Button>(R.id.btConnections)
+        val btNotifications = findViewById<Button>(R.id.btNotifications)
 
         wallet.visibility = View.GONE
         DataWallet.initializeSdk(
@@ -51,6 +52,10 @@ class MainActivity : AppCompatActivity() {
 
         connections.setOnClickListener {
             DataWallet.showConnections(this)
+        }
+
+        btNotifications.setOnClickListener{
+            DataWallet.showNotifications(this)
         }
     }
 }
