@@ -41,6 +41,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         InitializeWalletState.WALLET_OPENED -> {
                             wallet.visibility = View.VISIBLE
+                            getFirebaseDynamicLink()
                         }
                     }
                 }
@@ -56,6 +57,12 @@ class MainActivity : AppCompatActivity() {
 
         btNotifications.setOnClickListener{
             DataWallet.showNotifications(this)
+        }
+    }
+
+    private fun getFirebaseDynamicLink() {
+        if (intent.scheme == "didcomm") {
+            DataWallet.processDeepLink(this, intent.data.toString())
         }
     }
 }
