@@ -153,11 +153,7 @@ class ConnectionListActivity : BaseActivity(), UrlExtractFragment.ProgressListen
                             }
                         }
                         .addOnFailureListener(this) { e ->
-                            Log.w(
-                                InitializeActivity.TAG,
-                                "getDynamicLink:onFailure",
-                                e
-                            )
+                            extractFromUri(uri)
                         }
                 } else {
                     extractFromUri(uri)

@@ -3,8 +3,9 @@ package io.igrant.data_wallet.models.presentationExchange
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
 import io.igrant.data_wallet.models.presentationExchange.CredId
+import java.io.Serializable
 
-class RequestedAttribute {
+class RequestedAttribute(): Serializable {
     @SerializedName("name")
     @Expose
     var name: String? = null
@@ -15,5 +16,5 @@ class RequestedAttribute {
 
     @SerializedName("restrictions")
     @Expose
-    var restrictions: ArrayList<CredId>? = null
+    var restrictions: ArrayList<CredId>? = ArrayList()
 }

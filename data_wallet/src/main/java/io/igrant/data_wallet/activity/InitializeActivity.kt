@@ -14,6 +14,8 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.widget.Toolbar
 import androidx.constraintlayout.widget.ConstraintLayout
+import com.google.firebase.dynamiclinks.ktx.dynamicLinks
+import com.google.firebase.ktx.Firebase
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import io.igrant.data_wallet.R
@@ -111,6 +113,7 @@ class InitializeActivity : BaseActivity(), InitialActivityFunctions,UrlExtractFr
 
     companion object {
         const val TAG = "InitializeActivity"
+        const val DEEP_LINK = "io.igrant.data_wallet.activity.InitializeActivity.deep_link"
     }
 
     //views
@@ -127,9 +130,55 @@ class InitializeActivity : BaseActivity(), InitialActivityFunctions,UrlExtractFr
         setUpToolbar()
         initFragment()
         getMediatorConfig()
+        getIntentData()
         try {
             EventBus.getDefault().register(this)
         } catch (e: Exception) {
+        }
+    }
+
+    private fun getIntentData() {
+        if (intent.hasExtra(DEEP_LINK)){
+            try {
+                val uri: Uri = try {
+                    Uri.parse(intent.getStringExtra(DEEP_LINK))
+                } catch (e: Exception) {
+                    Uri.parse("igrant.io")
+                }
+
+                if (ConnectionUtils.isIGrnatValidUrl(uri.toString())) {
+                    Firebase.dynamicLinks
+                        .getDynamicLink(uri)
+                        .addOnSuccessListener(this) { pendingDynamicLinkData ->
+                            // Get deep link from result (may be null if no link is found)
+                            var deepLink: Uri? = null
+                            if (pendingDynamicLinkData != null) {
+                                deepLink = pendingDynamicLinkData.link
+
+                                try {
+                                    val deepLinkUri: Uri = deepLink ?: Uri.parse("igrant.io")
+
+                                    extractUrlFunction(deepLinkUri)
+                                } catch (e: Exception) {
+                                    Toast.makeText(
+                                        this,
+                                        resources.getString(R.string.connection_unexpected_error_please_try_again),
+                                        Toast.LENGTH_SHORT
+                                    ).show()
+                                }
+                            }
+                        }
+                        .addOnFailureListener(this) { e ->
+                            extractUrlFunction(uri)
+                        }
+
+                } else {
+                    extractUrlFunction(uri)
+                }
+            } catch (e: Exception) {
+
+            }
+            intent.removeExtra(DEEP_LINK)
         }
     }
 

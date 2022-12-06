@@ -66,6 +66,27 @@ After Wallet has opened, we can start accessing the Wallet, Connection, Notifica
     DataWallet.showNotifications(this)
 ````
 
+### Deeplink
+To process deeplink for connection, issue credential and verify credential
+
+Add the below intent filter to the activity where we initialize SDK
+````
+    <intent-filter>
+         <action android:name="android.intent.action.VIEW" />
+
+         <category android:name="android.intent.category.DEFAULT" />
+         <category android:name="android.intent.category.BROWSABLE" />
+
+         <data android:scheme="didcomm" />
+    </intent-filter>
+````
+
+Then add the below code to Wallet SDK initialize callback -> InitializeWalletState.WALLET_OPENED
+````
+    if (intent.scheme == "didcomm") {
+        DataWallet.processDeepLink(this, intent.data.toString())
+    }
+````
 ## Licensing
 Copyright (c) 2021 LCubed AB (iGrant.io), Sweden
 
