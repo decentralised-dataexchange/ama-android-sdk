@@ -2,8 +2,9 @@ package io.igrant.data_wallet.models.presentationExchange
 
 import com.google.gson.annotations.Expose
 import com.google.gson.annotations.SerializedName
+import java.io.Serializable
 
-class PresentationRequest {
+class PresentationRequest(): Serializable {
 
     @SerializedName("nonce")
     @Expose

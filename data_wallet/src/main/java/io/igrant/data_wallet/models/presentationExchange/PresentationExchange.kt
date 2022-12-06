@@ -15,7 +15,7 @@ class PresentationExchange():Serializable {
 
     @SerializedName("~data-agreement-context")
     @Expose
-    var dataAgreementContext: DataAgreementContext?=null
+    var dataAgreementContext:DataAgreementContext?=null
 
     @SerializedName("qr_id")
     @Expose
