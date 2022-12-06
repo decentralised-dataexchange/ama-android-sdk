@@ -21,8 +21,8 @@ object ConnectionUtils {
      */
     fun isIGrnatValidUrl(url:String):Boolean{
         return (url.contains("datawallet.page.link") ||
-                url.contains("igrant.page.link")||
-                url.contains("cloudagent.igrant.io") )
+                url.contains("igrant.page.link")||(
+                url.contains("cloudagent.igrant.io") && !url.contains("cloudagent.igrant.io/v1/")) )
     }
     /**
      * to check whether the connection already existing with the invitation key
