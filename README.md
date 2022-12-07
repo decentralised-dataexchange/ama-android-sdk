@@ -10,12 +10,13 @@ Download
 repositories {
     google()
     mavenCentral()
+    jcenter()
     maven { url "https://jitpack.io" }
     maven { url 'https://repo.sovrin.org/repository/maven-public'}
 }
 
 dependencies {
-    implementation 'com.github.decentralised-dataexchange:ama-android-sdk:1.12.3'
+    implementation 'com.github.decentralised-dataexchange:ama-android-sdk:1.12.4'
 
     implementation platform('com.google.firebase:firebase-bom:28.0.1')
     implementation 'com.google.firebase:firebase-dynamic-links-ktx'
