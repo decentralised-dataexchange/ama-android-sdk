@@ -49,8 +49,8 @@ class RequestListAdapter(
             } catch (e: Exception) {
             }
 
-            if (message.type == MessageTypes.TYPE_REQUEST_PRESENTATION) {
-                tvName.text = (message.presentation?.presentationRequest?.name ?: "").toUpperCase(
+            if (message.type == MessageTypes.SHARE_REQUEST) {
+                tvName.text = (message.presentation?.presentationRequest?.name ?: "").uppercase(
                     Locale.getDefault()
                 )
             } else if (message.type == MessageTypes.TYPE_EBSI_CREDENTIAL) {
@@ -65,14 +65,14 @@ class RequestListAdapter(
                             .toString(charset("UTF-8")), RawCredential::class.java
                     ).schemaId
                     val lst = schema?.split(":")
-                    tvName.text = (lst?.get(2) ?: "").toUpperCase(Locale.getDefault())
+                    tvName.text = (lst?.get(2) ?: "").uppercase(Locale.getDefault())
                 } catch (e: Exception) {
                     tvName.text = ""
                 }
             }
 
             tvType.text =
-                if (message.type == MessageTypes.TYPE_REQUEST_PRESENTATION) tvType.context.resources.getString(
+                if (message.type == MessageTypes.SHARE_REQUEST) tvType.context.resources.getString(
                     R.string.data_data_exchange
                 ) else tvType.context.resources.getString(R.string.general_data_agreement)
 

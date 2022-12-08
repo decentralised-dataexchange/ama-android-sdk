@@ -1,6 +1,7 @@
 package io.igrant.data_wallet.utils
 
 import android.app.Activity
+import android.content.Context
 import android.util.Base64
 import android.util.Log
 import android.view.Gravity
@@ -45,7 +46,7 @@ import java.util.*
 
 object UnPackIssueCredential {
 
-    fun unPackIssueCredential(context: Activity, body: JSONObject) {
+    fun unPackIssueCredential(context: Context, body: JSONObject) {
         val gson = Gson()
 
         val issueCredential = gson.fromJson(body.getString("message"), IssueCredential::class.java)
@@ -61,7 +62,7 @@ object UnPackIssueCredential {
             "{\"my_key\":\"$recipientKey\"}"
         )
 
-        if (connectionSearch.totalCount ?: 0 > 0) {
+        if ((connectionSearch.totalCount ?: 0) > 0) {
             val connectionObject: MediatorConnectionObject =
                 WalletManager.getGson.fromJson(
                     connectionSearch.records?.get(0)?.value,
@@ -73,7 +74,7 @@ object UnPackIssueCredential {
                 "{\"thread_id\": \"${issueCredential.thread?.thid ?: ""}\"}"
             )
 
-            if (credentialExchangeSearch.totalCount ?: 0 > 0) {
+            if ((credentialExchangeSearch.totalCount ?: 0) > 0) {
                 val credentialExchange =
                     gson.fromJson(
                         credentialExchangeSearch.records?.get(0)?.value,
@@ -107,7 +108,7 @@ object UnPackIssueCredential {
         senderVerKey: String,
         credDefId: String?,
         issueCredential: IssueCredential,
-        context: Activity
+        context: Context
     ) {
         val gson = Gson()
         val data = "{\n" +
@@ -182,7 +183,7 @@ object UnPackIssueCredential {
         credDefId: String?,
         senderVerKey: String,
         didDoc: DidDoc,
-        context: Activity
+        context: Context
     ) {
 
         val connectionSearch = SearchUtils.searchWallet(
@@ -190,7 +191,7 @@ object UnPackIssueCredential {
             "{\"my_key\":\"$senderVerKey\"}"
         )
         var connection: MediatorConnectionObject? = null
-        if (connectionSearch.totalCount ?: 0 > 0) {
+        if ((connectionSearch.totalCount ?: 0) > 0) {
             connection = WalletManager.getGson.fromJson(
                 connectionSearch.records?.get(0)?.value,
                 MediatorConnectionObject::class.java
@@ -231,7 +232,7 @@ object UnPackIssueCredential {
 
             val searchResponse =
                 gson.fromJson(credentialExchangeResponse, SearchResponse::class.java)
-            if (searchResponse.totalCount ?: 0 > 0) {
+            if ((searchResponse.totalCount ?: 0) > 0) {
                 val credentialExchange =
                     gson.fromJson(
                         searchResponse.records?.get(0)?.value,
@@ -301,7 +302,7 @@ object UnPackIssueCredential {
                 val record = WalletManager.getGson.fromJson(data, Record::class.java)
                 val notification = WalletManager.getGson.fromJson(record.value, Notification::class.java)
                 Log.d("milna", "storeCredential: $data")
-                val isDexa = DataAgreementContextBodyUtils.checkDataAgreementContextBodyIsOfDexa(notification.certificateOffer?.dataAgreementContext?.message?.body);
+                val isDexa = DataAgreementContextBodyUtils.checkDataAgreementContextBodyIsOfDexa(notification.certificateOffer?.dataAgreementContext?.message?.body)
                 if (!isDexa || (DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(notification.certificateOffer?.dataAgreementContext?.message?.body).dataPolicy?.thirdPartyDataSharing ==false))
                     WalletMethods.addWalletRecord(
                         WalletManager.getWallet,
@@ -321,23 +322,25 @@ object UnPackIssueCredential {
                 )
 
                 if (!isDexa || (DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(notification.certificateOffer?.dataAgreementContext?.message?.body).dataPolicy?.thirdPartyDataSharing ==false)){
-                //custom toast
-                    val layout: View = context.layoutInflater.inflate(
-                        R.layout.toast,
-                        context.findViewById(R.id.toast_layout_root)
-                    )
+                    Toast.makeText(context,context.getString(R.string.data_successfully_added_data_to_the_data_wallet),Toast.LENGTH_LONG).show()
 
-                    val text = layout.findViewById<View>(R.id.text) as TextView
-                    text.text =
-                        context.getString(R.string.data_successfully_added_data_to_the_data_wallet)
-
-                    val toast = Toast(context)
-                    toast.setGravity(Gravity.BOTTOM or Gravity.FILL_HORIZONTAL, 0, 0)
-                    toast.duration = Toast.LENGTH_LONG
-                    toast.view = layout
-                    toast.setMargin(0f, 0f)
-                    toast.show()
-                    //custom toast
+//                    //custom toast
+//                    val layout: View = context.layoutInflater.inflate(
+//                        R.layout.toast,
+//                        context.findViewById(R.id.toast_layout_root)
+//                    )
+//
+//                    val text = layout.findViewById<View>(R.id.text) as TextView
+//                    text.text =
+//                        context.getString(R.string.data_successfully_added_data_to_the_data_wallet)
+//
+//                    val toast = Toast(context)
+//                    toast.setGravity(Gravity.BOTTOM or Gravity.FILL_HORIZONTAL, 0, 0)
+//                    toast.duration = Toast.LENGTH_LONG
+//                    toast.view = layout
+//                    toast.setMargin(0f, 0f)
+//                    toast.show()
+//                    //custom toast
                 }
 
                 EventBus.getDefault().post(ReceiveCertificateEvent())

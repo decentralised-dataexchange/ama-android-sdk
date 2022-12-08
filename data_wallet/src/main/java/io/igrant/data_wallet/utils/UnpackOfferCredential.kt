@@ -24,7 +24,11 @@ import java.util.*
 
 object UnpackOfferCredential {
 
-    fun unPackOfferCredential(context: Context, body: JSONObject) {
+    fun unPackOfferCredential(
+        context: Context,
+        body: JSONObject,
+        notificationListener: NotificationListener?
+    ) {
         val message = JSONObject(body.getString("message"))
         val certificateOffer =
             WalletManager.getGson.fromJson(message.toString(), CertificateOffer::class.java)
@@ -53,7 +57,7 @@ object UnpackOfferCredential {
                 "{\"their_did\": \"${didResult.tags!!.did}\"}"
             )
 
-            if (connectionResult.totalCount ?: 0 > 0) {
+            if ((connectionResult.totalCount ?: 0) > 0) {
                 val connecction = WalletManager.getGson.fromJson(
                     connectionResult.records?.get(0)?.value, MediatorConnectionObject::class.java
                 )
@@ -71,7 +75,7 @@ object UnpackOfferCredential {
                 }
 
                 val notification = Notification()
-                notification.type = MessageTypes.TYPE_OFFER_CREDENTIAL
+                notification.type = MessageTypes.OFFER_REQUEST
                 notification.stat = "Active"
                 notification.certificateOffer = certificateOffer
                 notification.connection = connecction
@@ -83,7 +87,7 @@ object UnpackOfferCredential {
                     certificateOffer.id ?: "",
                     WalletManager.getGson.toJson(notification),
                     "{\n" +
-                            "  \"type\":\"${MessageTypes.TYPE_OFFER_CREDENTIAL}\",\n" +
+                            "  \"type\":\"${MessageTypes.OFFER_REQUEST}\",\n" +
                             "  \"connectionId\":\"${connecction.requestId}\",\n" +
                             "  \"certificateId\":\"${certificateOffer.id}\",\n" +
                             "  \"stat\":\"Active\"\n" +
@@ -106,13 +110,20 @@ object UnpackOfferCredential {
                             searchResponse.records!![0]
                         )
 
-                        MessageUtils.showNotification(
-                            intent,
-                            context,
-                            MessageTypes.TYPE_ISSUE_CREDENTIAL,
-                            context.getString(R.string.data_received_offer_credentials),
-                            context.getString(R.string.data_received_offer_credential_from_organisation)
-                        )
+                        if (notificationListener != null) {
+                            notificationListener.receivedNotification(
+                                MessageTypes.OFFER_REQUEST,
+                                intent
+                            )
+                        } else {
+                            MessageUtils.showNotification(
+                                intent,
+                                context,
+                                MessageTypes.TYPE_ISSUE_CREDENTIAL,
+                                context.getString(R.string.data_received_offer_credentials),
+                                context.getString(R.string.data_received_offer_credential_from_organisation)
+                            )
+                        }
                         EventBus.getDefault()
                             .post(ReceiveExchangeRequestEvent())
 
