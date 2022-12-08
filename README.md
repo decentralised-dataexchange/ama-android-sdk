@@ -1,6 +1,6 @@
 # AMA-android-sdk
 
-This contains the SDK for Aries mobileagent android, an open source mobile agent for achieving self sovereign identity (SSI), created as part NGI-Trust eSSIF Lab, with efforts from iGrant.io, unikk.me, MyData etc. This SDK can be packaged into any mobile app enabling them with a decentralised datawallet App features. 
+This contains the SDK for Aries mobileagent android, an open source mobile agent for achieving self sovereign identity (SSI), created as part NGI-Trust eSSIF Lab, with efforts from iGrant.io, unikk.me, MyData etc. This SDK can be packaged into any mobile app enabling them with a decentralised datawallet App features.
 
 
 Download
@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.decentralised-dataexchange:ama-android-sdk:1.12.4'
+    implementation 'com.github.decentralised-dataexchange:ama-android-sdk:1.12.5'
 
     implementation platform('com.google.firebase:firebase-bom:28.0.1')
     implementation 'com.google.firebase:firebase-dynamic-links-ktx'
@@ -42,7 +42,7 @@ DataWallet.initializeSdk(
                             
                         }
                         InitializeWalletState.WALLET_OPENED -> {
-                           
+                           DataWalletConfigurations.registerForSubscription(this)
                         }
                     }
                 }
@@ -88,6 +88,33 @@ Then add the below code to Wallet SDK initialize callback -> InitializeWalletSta
         DataWallet.processDeepLink(this, intent.data.toString())
     }
 ````
+
+### Subscribe to notifications
+To override the notifications you can use notification listener
+
+````
+        DataWalletConfigurations.registerForSubscription(this@MainActivity,
+                        object : NotificationListener {
+                            override fun receivedNotification(
+                                notificationType: String,
+                                intent: Intent
+                            ) {
+                                when (notificationType) {
+                                    MessageTypes.SHARE_REQUEST -> {
+                                        // your logic
+                                        // intent will contain the screen to redirect
+                                        // startActivity(intent)
+                                    }
+                                    MessageTypes.OFFER_REQUEST -> {
+                                        // Do your logic
+                                        // intent will contain the screen to redirect
+                                        // startActivity(intent)
+                                    }
+                                }
+                            }
+                        })
+````
+
 ## Licensing
 Copyright (c) 2021 LCubed AB (iGrant.io), Sweden
 
