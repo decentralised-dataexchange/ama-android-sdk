@@ -209,7 +209,7 @@ class OfferCertificateActivity : BaseActivity() {
 //            tvHead.text =
 //                notification?.ebsiCertificate?.searchableText?.toUpperCase(Locale.getDefault())
 //        } else {
-            tvHead.text = name.toUpperCase(Locale.getDefault())
+            tvHead.text = name.uppercase(Locale.getDefault())
             fetchPurposeDetail()
 //        }
     }
@@ -494,7 +494,7 @@ class OfferCertificateActivity : BaseActivity() {
                                 )
 
                                 val tagJson = "{\n" +
-                                        "  \"type\":\"${MessageTypes.TYPE_OFFER_CREDENTIAL}\",\n" +
+                                        "  \"type\":\"${MessageTypes.OFFER_REQUEST}\",\n" +
                                         "  \"connectionId\":\"${mConnectionId}\",\n" +
                                         "  \"stat\":\"Processed\"\n" +
                                         "}"
@@ -536,10 +536,10 @@ class OfferCertificateActivity : BaseActivity() {
     }
 
     private fun setUpAdapter() {
-        val width = DisplayUtils.getScreenWidth() - TextUtils.convertDpToPixel(
-            60f,
-            rvAttributes.context
-        )
+//        val width = DisplayUtils.getScreenWidth() - TextUtils.convertDpToPixel(
+//            60f,
+//            rvAttributes.context
+//        )
         adapter = SectionAdapter(
             if (notification?.type == MessageTypes.TYPE_EBSI_CREDENTIAL)
                 mapToList(

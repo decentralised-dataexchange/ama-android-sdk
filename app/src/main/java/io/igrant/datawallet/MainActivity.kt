@@ -1,16 +1,11 @@
 package io.igrant.datawallet
 
-import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
-import io.igrant.data_wallet.activity.InitializeActivity
 import io.igrant.data_wallet.indy.LedgerNetworkType
-import io.igrant.data_wallet.utils.DataWallet
-import io.igrant.data_wallet.utils.InitializeWalletCallback
-import io.igrant.data_wallet.utils.InitializeWalletState
+import io.igrant.data_wallet.utils.*
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -41,6 +36,7 @@ class MainActivity : AppCompatActivity() {
                         }
                         InitializeWalletState.WALLET_OPENED -> {
                             wallet.visibility = View.VISIBLE
+                            DataWalletConfigurations.registerForSubscription(this@MainActivity)
                             getFirebaseDynamicLink()
                         }
                     }
@@ -55,7 +51,7 @@ class MainActivity : AppCompatActivity() {
             DataWallet.showConnections(this)
         }
 
-        btNotifications.setOnClickListener{
+        btNotifications.setOnClickListener {
             DataWallet.showNotifications(this)
         }
     }

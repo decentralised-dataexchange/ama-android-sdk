@@ -16,7 +16,7 @@ import io.igrant.data_wallet.indy.WalletManager
 import io.igrant.data_wallet.listeners.ConnectionMessageListener
 import io.igrant.data_wallet.models.Notification
 import io.igrant.data_wallet.utils.ExchangeUtils.showExchangeData
-import io.igrant.data_wallet.utils.MessageTypes.Companion.TYPE_REQUEST_PRESENTATION
+import io.igrant.data_wallet.utils.MessageTypes.Companion.SHARE_REQUEST
 import io.igrant.data_wallet.utils.SearchUtils
 import io.igrant.data_wallet.utils.WalletRecordType
 import org.greenrobot.eventbus.EventBus
@@ -76,7 +76,7 @@ class RequestActivity : BaseActivity() {
             override fun onConnectionMessageClick(record: Record, name: String) {
                 val message =
                     WalletManager.getGson.fromJson(record.value, Notification::class.java)
-                if (message.type == TYPE_REQUEST_PRESENTATION) {
+                if (message.type == SHARE_REQUEST) {
                     showExchangeData(record, this@RequestActivity)
                 } else {
                     val intent =
