@@ -6,6 +6,7 @@ import android.system.ErrnoException
 import android.system.Os
 import android.util.Log
 import io.igrant.data_wallet.activity.ConnectionListActivity
+import io.igrant.data_wallet.activity.HistoryActivity
 import io.igrant.data_wallet.activity.InitializeActivity
 import io.igrant.data_wallet.activity.InitializeActivity.Companion.DEEP_LINK
 import io.igrant.data_wallet.activity.RequestActivity
@@ -64,6 +65,15 @@ object DataWallet {
         }
     }
 
+    fun showMySharedData(context: Context) {
+        if (PoolManager.getPool == null) {
+
+        } else {
+            val intent = Intent(context, HistoryActivity::class.java)
+            context.startActivity(intent)
+        }
+    }
+
     fun showNotifications(context: Context) {
         if (PoolManager.getPool == null) {
 
@@ -73,12 +83,12 @@ object DataWallet {
         }
     }
 
-    fun processDeepLink(context: Context,deeplink:String){
+    fun processDeepLink(context: Context, deeplink: String) {
         if (PoolManager.getPool == null) {
 
         } else {
             val intent = Intent(context, InitializeActivity::class.java)
-            intent.putExtra(DEEP_LINK,deeplink)
+            intent.putExtra(DEEP_LINK, deeplink)
             context.startActivity(intent)
         }
     }
