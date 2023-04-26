@@ -41,9 +41,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="My Shared Data"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btShareData"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btNotifications" />
+
+    <Button
+        android:id="@+id/btShareData"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Share Data"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btMySharedHistory" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
