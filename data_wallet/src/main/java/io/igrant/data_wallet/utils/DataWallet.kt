@@ -93,6 +93,15 @@ object DataWallet {
         }
     }
 
+    fun openShareData(context: Context) {
+        if (PoolManager.getPool == null) {
+
+        } else {
+            val intent = Intent(context, InitializeActivity::class.java)
+            intent.putExtra(InitializeActivity.SHOW_SHARE_DATA_SCANNER, true)
+            context.startActivity(intent)
+        }
+    }
     private fun initWallet(
         context: Context,
         mListener: InitializeWalletCallback,

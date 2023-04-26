@@ -11,7 +11,6 @@ import android.os.Handler
 import android.os.Looper
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Base64
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
@@ -25,26 +24,17 @@ import io.igrant.data_wallet.R
 import io.igrant.data_wallet.activity.CertificateDetailActivity
 import io.igrant.data_wallet.activity.CertificateDetailActivity.Companion.EXTRA_WALLET_DETAIL
 import io.igrant.data_wallet.activity.CertificateDetailActivity.Companion.EXTRA_WALLET_POSITION
-import io.igrant.data_wallet.activity.ConnectionListActivity
 import io.igrant.data_wallet.activity.ExtractListeners
-import io.igrant.data_wallet.activity.ProposeAndExchangeDataActivity
-import io.igrant.data_wallet.activity.ProposeAndExchangeDataActivity.Companion.EXTRA_PRESENTATION_INVITATION
-import io.igrant.data_wallet.activity.ProposeAndExchangeDataActivity.Companion.EXTRA_PRESENTATION_PROPOSAL
-import io.igrant.data_wallet.activity.ProposeAndExchangeDataActivity.Companion.EXTRA_PRESENTATION_QR_ID
 import io.igrant.data_wallet.adapter.WalletCertificatesAdapter
-import io.igrant.data_wallet.communication.ApiManager
 import io.igrant.data_wallet.custom.WrapContentLinearLayoutManager
 import io.igrant.data_wallet.events.DeleteCertificateEvent
 import io.igrant.data_wallet.events.ReceiveCertificateEvent
 import io.igrant.data_wallet.indy.WalletManager
 import io.igrant.data_wallet.listeners.WalletListener
-import io.igrant.data_wallet.models.agentConfig.Invitation
-import io.igrant.data_wallet.models.qr.QrDecode
 import io.igrant.data_wallet.models.wallet.WalletModel
 import io.igrant.data_wallet.models.walletSearch.Record
 import io.igrant.data_wallet.qrcode.utils.QRScanner
 import io.igrant.data_wallet.utils.*
-import io.igrant.data_wallet.utils.ConnectionUtils.saveConnectionAndExchangeData
 import io.igrant.data_wallet.utils.WalletRecordType.Companion.WALLET
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -53,14 +43,7 @@ import kotlinx.coroutines.withContext
 import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
-import org.hyperledger.indy.sdk.anoncreds.Anoncreds
-import org.hyperledger.indy.sdk.non_secrets.WalletRecord
-import org.json.JSONObject
-import retrofit2.Call
-import retrofit2.Callback
-import retrofit2.Response
 import java.util.*
-import kotlin.collections.ArrayList
 
 class WalletFragment : BaseFragment() {
 
@@ -80,9 +63,16 @@ class WalletFragment : BaseFragment() {
 
     private var mExtractListeners: ExtractListeners? = null
 
+    private var openScanner: Boolean? = false
+
     override fun onAttach(context: Context) {
         super.onAttach(context)
         mExtractListeners = context as ExtractListeners
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        openScanner = arguments?.getBoolean(OPEN_SCANNER)
     }
 
     override fun onCreateView(
@@ -106,6 +96,10 @@ class WalletFragment : BaseFragment() {
         try {
             EventBus.getDefault().register(this)
         } catch (e: Exception) {
+        }
+
+        if (openScanner == true) {
+            exchangeData()
         }
         return view
     }
@@ -235,39 +229,11 @@ class WalletFragment : BaseFragment() {
         try {
 
             ivAdd.setOnClickListener {
-
-                if (PermissionUtils.hasPermissions(
-                        requireActivity(),
-                        PERMISSIONS
-                    )
-                ) {
-                    QRScanner().withLocale(LocaleHelper.getLanguage(requireContext()))
-                        .start(
-                            requireContext(),
-                            this,
-                            REQUEST_CODE_SCAN_INVITATION
-                        )
-                } else {
-                    requestPermissions(PERMISSIONS, PICK_IMAGE_REQUEST)
-                }
+                exchangeData()
             }
 
             tvExchangeData.setOnClickListener {
-
-                if (PermissionUtils.hasPermissions(
-                        requireActivity(),
-                        PERMISSIONS
-                    )
-                ) {
-                    QRScanner().withLocale(LocaleHelper.getLanguage(requireContext()))
-                        .start(
-                            requireContext(),
-                            this,
-                            REQUEST_CODE_SCAN_INVITATION
-                        )
-                } else {
-                    requestPermissions(PERMISSIONS, PICK_IMAGE_REQUEST)
-                }
+                exchangeData()
             }
 
             etSearchWallet.addTextChangedListener(object : TextWatcher {
@@ -289,6 +255,23 @@ class WalletFragment : BaseFragment() {
                 }
             })
         } catch (e: Exception) {
+        }
+    }
+
+    private fun exchangeData() {
+        if (PermissionUtils.hasPermissions(
+                requireActivity(),
+                PERMISSIONS
+            )
+        ) {
+            QRScanner().withLocale(LocaleHelper.getLanguage(requireContext()))
+                .start(
+                    requireContext(),
+                    this,
+                    REQUEST_CODE_SCAN_INVITATION
+                )
+        } else {
+            requestPermissions(PERMISSIONS, PICK_IMAGE_REQUEST)
         }
     }
 
@@ -406,13 +389,19 @@ class WalletFragment : BaseFragment() {
 
     companion object {
         private const val TAG = "WalletFragment"
-        fun newInstance(): WalletFragment {
-            return WalletFragment()
+        fun newInstance(showScanner: Boolean): WalletFragment {
+            val walletFragment: WalletFragment = WalletFragment()
+            val args = Bundle()
+            args.putBoolean(OPEN_SCANNER, showScanner)
+            walletFragment.arguments = args
+            return walletFragment
         }
 
         private const val PICK_IMAGE_REQUEST = 101
         val PERMISSIONS =
             arrayOf(Manifest.permission.CAMERA)
         private const val REQUEST_CODE_SCAN_INVITATION = 202
+
+        private const val OPEN_SCANNER = "io.igrant.data_wallet.fragment.WalletFragment.openScanner"
     }
 }

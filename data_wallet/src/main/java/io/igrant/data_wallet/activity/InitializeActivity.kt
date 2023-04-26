@@ -20,11 +20,14 @@ import org.greenrobot.eventbus.EventBus
 import org.greenrobot.eventbus.Subscribe
 import org.greenrobot.eventbus.ThreadMode
 
-class InitializeActivity : BaseActivity(), InitialActivityFunctions,UrlExtractFragment.ProgressListener, ExtractListeners {
+class InitializeActivity : BaseActivity(), InitialActivityFunctions,
+    UrlExtractFragment.ProgressListener, ExtractListeners {
 
     companion object {
         const val TAG = "InitializeActivity"
         const val DEEP_LINK = "io.igrant.data_wallet.activity.InitializeActivity.deep_link"
+        const val SHOW_SHARE_DATA_SCANNER =
+            "io.igrant.data_wallet.activity.InitializeActivity.scanner"
     }
 
     //views
@@ -34,13 +37,15 @@ class InitializeActivity : BaseActivity(), InitialActivityFunctions,UrlExtractFr
 
     private lateinit var tvLoadingStatus: TextView
 
+    private var showShareDataScanner: Boolean = false
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_initialize)
         initViews()
         setUpToolbar()
-        initFragment()
         getIntentData()
+        initFragment()
         try {
             EventBus.getDefault().register(this)
         } catch (e: Exception) {
@@ -48,7 +53,10 @@ class InitializeActivity : BaseActivity(), InitialActivityFunctions,UrlExtractFr
     }
 
     private fun getIntentData() {
-        if (intent.hasExtra(DEEP_LINK)){
+        if (intent.hasExtra(SHOW_SHARE_DATA_SCANNER))
+            showShareDataScanner = intent.getBooleanExtra(SHOW_SHARE_DATA_SCANNER, false)
+
+        if (intent.hasExtra(DEEP_LINK)) {
             try {
                 val uri: Uri = try {
                     Uri.parse(intent.getStringExtra(DEEP_LINK))
@@ -118,7 +126,7 @@ class InitializeActivity : BaseActivity(), InitialActivityFunctions,UrlExtractFr
 
     private fun initFragment() {
         if (supportFragmentManager != null)
-            NavigationUtils.showWalletFragment(supportFragmentManager, false)
+            NavigationUtils.showWalletFragment(supportFragmentManager, false,showShareDataScanner)
     }
 
     @Subscribe(threadMode = ThreadMode.MAIN)
