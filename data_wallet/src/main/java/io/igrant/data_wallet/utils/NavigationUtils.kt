@@ -21,8 +21,12 @@ object NavigationUtils {
         transaction.commit()
     }
 
-    fun showWalletFragment(fragmentManager: FragmentManager?,addToBackStack: Boolean) {
-        val walletFragment: WalletFragment = WalletFragment.newInstance()
+    fun showWalletFragment(
+        fragmentManager: FragmentManager?,
+        addToBackStack: Boolean,
+        showScanner: Boolean
+    ) {
+        val walletFragment: WalletFragment = WalletFragment.newInstance(showScanner)
         showFragment(walletFragment, fragmentManager!!, false)
     }
 

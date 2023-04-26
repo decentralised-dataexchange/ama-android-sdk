@@ -14,7 +14,9 @@ class MainActivity : AppCompatActivity() {
 
         val wallet = findViewById<Button>(R.id.wallet)
         val connections = findViewById<Button>(R.id.btConnections)
+        val mySharedHistory = findViewById<Button>(R.id.btMySharedHistory)
         val btNotifications = findViewById<Button>(R.id.btNotifications)
+        val btShareData = findViewById<Button>(R.id.btShareData)
 
         wallet.visibility = View.GONE
         DataWallet.initializeSdk(
@@ -51,8 +53,16 @@ class MainActivity : AppCompatActivity() {
             DataWallet.showConnections(this)
         }
 
+        mySharedHistory.setOnClickListener {
+            DataWallet.showMySharedData(this)
+        }
+
         btNotifications.setOnClickListener {
             DataWallet.showNotifications(this)
+        }
+
+        btShareData.setOnClickListener {
+            DataWallet.openShareData(this)
         }
     }
 
