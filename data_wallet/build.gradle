@@ -7,7 +7,7 @@ apply plugin: 'com.github.dcendents.android-maven'
 apply plugin: 'com.google.gms.google-services'
 
 group='com.github.decentralised-dataexchange'
-version = '2.4.1'
+version = '2.5.1'
 
 android {
     compileSdkVersion 32
@@ -16,8 +16,8 @@ android {
     defaultConfig {
         minSdkVersion 21
         targetSdkVersion 32
-        versionCode 8
-        versionName "2.4.1"
+        versionCode 9
+        versionName "2.5.1"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles "consumer-rules.pro"
