@@ -5,13 +5,11 @@ import io.igrant.data_wallet.models.agentConfig.ConfigPostResponse
 import io.igrant.data_wallet.models.agentConfig.ConfigResponse
 import io.igrant.data_wallet.models.ledger.Ledger
 import io.igrant.data_wallet.models.qr.QrDecode
+import io.igrant.data_wallet.utils.dataAgreement.DataAgreementResponse
 import okhttp3.RequestBody
 import okhttp3.ResponseBody
 import retrofit2.Call
-import retrofit2.http.Body
-import retrofit2.http.GET
-import retrofit2.http.POST
-import retrofit2.http.Url
+import retrofit2.http.*
 
 interface APIService {
 
@@ -22,28 +20,28 @@ interface APIService {
     fun getRegistryConfig(): Call<ConfigResponse>
 
     @POST(" ")
-    fun postDetails(@Body bytes:RequestBody ): Call<ResponseBody>
+    fun postDetails(@Body bytes: RequestBody): Call<ResponseBody>
 
     @POST(" ")
-    fun pollMessages(@Body bytes:RequestBody): Call<ResponseBody>
+    fun pollMessages(@Body bytes: RequestBody): Call<ResponseBody>
 
     @POST(" ")
-    fun cloudConnection(@Body bytes:RequestBody): Call<ResponseBody>
+    fun cloudConnection(@Body bytes: RequestBody): Call<ResponseBody>
 
     @POST
-    fun postData(@Url url:String, @Body bytes:RequestBody): Call<ConfigPostResponse>
+    fun postData(@Url url: String, @Body bytes: RequestBody): Call<ConfigPostResponse>
 
     @POST
-    fun postDataWithoutData(@Url url:String, @Body bytes:RequestBody): Call<ResponseBody>
+    fun postDataWithoutData(@Url url: String, @Body bytes: RequestBody): Call<ResponseBody>
 
     @POST(" ")
     fun postDetailsWithBody(@Body bytes: RequestBody): Call<ConfigPostResponse>
 
     @GET
-    fun getGenesis(@Url url:String): Call<ResponseBody>
+    fun getGenesis(@Url url: String): Call<ResponseBody>
 
     @POST
-    fun extractUrl(@Url url:String): Call<QrDecode>
+    fun extractUrl(@Url url: String): Call<QrDecode>
 
     @GET
     fun getLastUpdatedTimes(@Url url: String): Call<LastUpdatedTimesResponse>
@@ -51,4 +49,9 @@ interface APIService {
     @GET
     fun getLedger(@Url url: String): Call<ArrayList<Ledger>>
 
+    @GET
+    fun getDataAgreement(
+        @Url url: String,
+        @Header("Authorization") authorization: String
+    ): Call<DataAgreementResponse>
 }
