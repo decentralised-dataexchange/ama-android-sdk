@@ -8,7 +8,7 @@ data class DataAgreementBodyDexa(
 
     @SerializedName("@context")
     @Expose
-    var context: ArrayList<String>? = null,
+    var context: Any? = null,
 
     @SerializedName("@id")
     @Expose

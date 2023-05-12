@@ -51,9 +51,19 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Share Data"
-        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintBottom_toTopOf="@+id/btDataAgreementPolicy"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btMySharedHistory" />
+
+    <Button
+        android:id="@+id/btDataAgreementPolicy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Data Agreement policy"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btShareData" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -124,18 +124,18 @@ object DataAgreementPolicyUtil {
                 null,
                 if (DataAgreementContextBodyUtils.checkDataAgreementContextBodyIsOfDexa(mHistory?.dataAgreementContext?.message?.body)) {
                     DataAgreementPolicy(
-                       DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).lawfulBasis
+                        DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).lawfulBasis
                             ?: "",
-                       DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).dataPolicy?.policyURL
+                        DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).dataPolicy?.policyURL
                             ?: "",
-                       DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).dataPolicy?.jurisdiction
+                        DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).dataPolicy?.jurisdiction
                             ?: "",
-                       DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).dataPolicy?.industrySector
+                        DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).dataPolicy?.industrySector
                             ?: "",
-                       DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).dataPolicy?.geographicRestriction
+                        DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).dataPolicy?.geographicRestriction
                             ?: "",
                         null,
-                       DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).dataPolicy?.dataRetentionPeriod.toString()
+                        DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(mHistory?.dataAgreementContext?.message?.body).dataPolicy?.dataRetentionPeriod.toString()
                     )
                 } else {
                     DataAgreementPolicy(
@@ -199,7 +199,8 @@ object DataAgreementPolicyUtil {
         mHistory: DataAgreementPolicy?,
         dataAgreementContext: DataAgreementContext?,
         mConnectionId: String?, context: Activity,
-        isSigVerified: Boolean?
+        isSigVerified: Boolean?,
+        isPolicyOnly: Boolean? = false
     ) {
         val intent = Intent(context, DataAgreementPolicyActivity::class.java)
         var dataAgreementPolicyUIModel = DataAgreementPolicyUIModel(
@@ -207,7 +208,8 @@ object DataAgreementPolicyUtil {
             mConnectionId,
             isSigVerified,
             mHistory,
-            dataAgreementContext
+            dataAgreementContext,
+            isPolicyOnly = isPolicyOnly
         )
 
         PolicyCacheManager.policyList = arrayListOf(dataAgreementPolicyUIModel)
