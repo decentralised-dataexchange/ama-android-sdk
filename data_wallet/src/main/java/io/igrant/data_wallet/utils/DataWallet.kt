@@ -83,6 +83,10 @@ object DataWallet {
         }
     }
 
+    fun queryCredentials(credDefId: String?, schemaId: String?): String {
+        return SearchUtils.searchForCredentials(credDefId = credDefId, schemaId = schemaId)
+    }
+
     fun processDeepLink(context: Context, deeplink: String) {
         if (PoolManager.getPool == null) {
 
@@ -102,6 +106,7 @@ object DataWallet {
             context.startActivity(intent)
         }
     }
+
     private fun initWallet(
         context: Context,
         mListener: InitializeWalletCallback,
