@@ -9,5 +9,6 @@ data class DataAgreementPolicyUIModel(
     val connectionId: String?,
     var isSignatureVerified: Boolean?,
     val dataAgreementPolicy: DataAgreementPolicy?,
-    val dataAgreementContext: DataAgreementContext?
+    val dataAgreementContext: DataAgreementContext?,
+    val isPolicyOnly: Boolean? = false
 ): Serializable

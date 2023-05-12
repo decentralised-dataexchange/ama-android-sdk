@@ -129,20 +129,32 @@ class DataAgreementPolicyFragment : BaseFragment() {
     }
 
     private fun setUpProofList() {
-        if (dataAgreementPolicyUIModel?.dataAgreementContext != null) {
+        if (dataAgreementPolicyUIModel?.dataAgreementContext != null && dataAgreementPolicyUIModel?.isPolicyOnly != true) {
             var proofChain: ArrayList<ProofDexa> = ArrayList()
             if (isDexa) {
-                if (DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body).proofChain != null)
+                if (DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(
+                        dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body
+                    ).proofChain != null
+                )
                     proofChain =
-                        DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body).proofChain
+                        DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(
+                            dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body
+                        ).proofChain
                             ?: ArrayList()
                 else proofChain.add(
-                    DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body).proof
+                    DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(
+                        dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body
+                    ).proof
                         ?: ProofDexa()
                 )
             } else {
-                if (DataAgreementContextBodyUtils.convertToNormalDataAgreementBody(dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body).proofChain != null)
-                    for (proof in DataAgreementContextBodyUtils.convertToNormalDataAgreementBody(dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body ).proofChain
+                if (DataAgreementContextBodyUtils.convertToNormalDataAgreementBody(
+                        dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body
+                    ).proofChain != null
+                )
+                    for (proof in DataAgreementContextBodyUtils.convertToNormalDataAgreementBody(
+                        dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body
+                    ).proofChain
                         ?: ArrayList()) {
                         proofChain.add(
                             ProofDexa(
@@ -159,7 +171,9 @@ class DataAgreementPolicyFragment : BaseFragment() {
                     }
                 else {
                     val proof =
-                        DataAgreementContextBodyUtils.convertToNormalDataAgreementBody(dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body).proof
+                        DataAgreementContextBodyUtils.convertToNormalDataAgreementBody(
+                            dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body
+                        ).proof
                             ?: Proof()
                     proofChain.add(
                         ProofDexa(
@@ -193,7 +207,9 @@ class DataAgreementPolicyFragment : BaseFragment() {
 
             if (isDexa) {
                 val dataAgreementBody =
-                     DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body)
+                    DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(
+                        dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body
+                    )
                 var subList: ArrayList<Attributes> = ArrayList()
                 if (dataAgreementBody.purpose != null)
                     subList.add(
@@ -350,7 +366,9 @@ class DataAgreementPolicyFragment : BaseFragment() {
 //                }
             } else {
                 val dataAgreementBody =
-                    DataAgreementContextBodyUtils.convertToNormalDataAgreementBody(dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body)
+                    DataAgreementContextBodyUtils.convertToNormalDataAgreementBody(
+                        dataAgreementPolicyUIModel?.dataAgreementContext?.message?.body
+                    )
 
                 var subList: ArrayList<Attributes> = ArrayList()
                 if (dataAgreementBody.purpose != null)

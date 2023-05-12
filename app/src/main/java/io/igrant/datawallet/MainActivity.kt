@@ -6,6 +6,7 @@ import android.view.View
 import android.widget.Button
 import io.igrant.data_wallet.indy.LedgerNetworkType
 import io.igrant.data_wallet.utils.*
+import io.igrant.data_wallet.utils.dataAgreement.DataAgreementUtils
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -17,6 +18,7 @@ class MainActivity : AppCompatActivity() {
         val mySharedHistory = findViewById<Button>(R.id.btMySharedHistory)
         val btNotifications = findViewById<Button>(R.id.btNotifications)
         val btShareData = findViewById<Button>(R.id.btShareData)
+        val btDataAgreementPolicy = findViewById<Button>(R.id.btDataAgreementPolicy)
 
         wallet.visibility = View.GONE
         DataWallet.initializeSdk(
@@ -55,6 +57,15 @@ class MainActivity : AppCompatActivity() {
 
         mySharedHistory.setOnClickListener {
             DataWallet.showMySharedData(this)
+        }
+
+        btDataAgreementPolicy.setOnClickListener {
+            DataAgreementUtils.fetchDataAgreement(
+                "ApiKey eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyaWQiOiI2NDVhNDE0YmI5YjA1NTAwMDE1MGIyNDciLCJvcmdpZCI6IiIsImVudiI6IiIsImV4cCI6MTcxNDc0MDg4Nn0.u6pBpv12ZfdHYMPoQHYR-oBR9ZOZVeHiChaQ8yiEMxE",
+                "645a4172b9b055000150b248",
+                "0900ccb0-73d5-4175-ae79-a3fc14a14e9e",
+                this
+            )
         }
 
         btNotifications.setOnClickListener {
