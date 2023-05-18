@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.github.decentralised-dataexchange:ama-android-sdk:1.12.5'
+    implementation 'com.github.decentralised-dataexchange:ama-android-sdk:<Latest Version>'
 
     implementation platform('com.google.firebase:firebase-bom:28.0.1')
     implementation 'com.google.firebase:firebase-dynamic-links-ktx'
@@ -66,6 +66,30 @@ After Wallet has opened, we can start accessing the Wallet, Connection, Notifica
 ````
     DataWallet.showNotifications(this)
 ````
+
+### My Shared Data
+````
+    DataWallet.showMySharedData(this)
+````
+
+### Show Data Agreement Policy
+````
+    DataAgreementUtils.fetchDataAgreement(
+                <API Key>,
+                <Organization ID>,
+                <Data Agreement ID>,
+                this
+            )
+````
+
+### How to Query Credentials
+````
+    DataWallet.queryCredentials(
+                <Cred Def ID>,
+                <Schema ID>
+            )
+````
+Cred Def ID and Schema ID are optional. If we didn't pass any values, then it will query all the credentials
 
 ### Deeplink
 To process deeplink for connection, issue credential and verify credential
