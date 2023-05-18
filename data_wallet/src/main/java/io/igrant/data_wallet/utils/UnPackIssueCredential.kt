@@ -43,6 +43,8 @@ import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 import java.util.*
+import io.igrant.data_wallet.utils.wrappers.CredentialTypes
+import io.igrant.data_wallet.utils.wrappers.ReceiptWrapper
 
 object UnPackIssueCredential {
 
@@ -275,9 +277,23 @@ object UnPackIssueCredential {
                     "${searchResponse.records?.get(0)?.id}"
                 ).get()
 
+                Log.d("milna", "storeCredential: checking")
+
+                val subCredentialType = try {
+                    if (ReceiptWrapper.checkCredentialType(
+                            credentialExchange.credentialProposalDict?.credentialProposal?.attributes
+                                ?: ArrayList()
+                        ) == CredentialTypes.RECEIPT
+                    ) CredentialTypes.RECEIPT else CredentialTypes.DEFAULT
+                } catch (e: Exception) {
+                    CredentialTypes.DEFAULT
+                }
+
+                Log.d("milna", "storeCredential: $subCredentialType")
+
                 val walletModel = WalletModel()
                 walletModel.type = WalletRecordType.CERTIFICATE_TYPE_CREDENTIALS
-                walletModel.subType = ""
+                walletModel.subType = subCredentialType
                 walletModel.connection = connection
 
                 try {
@@ -293,17 +309,22 @@ object UnPackIssueCredential {
 
                 val walletModelTag = "{" +
                         "\"type\":\"${WalletRecordType.CERTIFICATE_TYPE_CREDENTIALS}\"," +
-                        "\"sub_type\":\"\"," +
+                        "\"sub_type\":\"$subCredentialType\"," +
                         "\"connection_id\":\"${connection?.requestId ?: ""}\"," +
                         "\"credential_id\":\"$credentialId\"," +
                         "\"schema_id\":\"${credentialExchange.rawCredential?.schemaId ?: ""}\"" +
                         "}"
 
                 val record = WalletManager.getGson.fromJson(data, Record::class.java)
-                val notification = WalletManager.getGson.fromJson(record.value, Notification::class.java)
+                val notification =
+                    WalletManager.getGson.fromJson(record.value, Notification::class.java)
                 Log.d("milna", "storeCredential: $data")
-                val isDexa = DataAgreementContextBodyUtils.checkDataAgreementContextBodyIsOfDexa(notification.certificateOffer?.dataAgreementContext?.message?.body)
-                if (!isDexa || (DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(notification.certificateOffer?.dataAgreementContext?.message?.body).dataPolicy?.thirdPartyDataSharing ==false))
+                val isDexa =
+                    DataAgreementContextBodyUtils.checkDataAgreementContextBodyIsOfDexa(notification.certificateOffer?.dataAgreementContext?.message?.body);
+                if (!isDexa || (DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(
+                        notification.certificateOffer?.dataAgreementContext?.message?.body
+                    ).dataPolicy?.thirdPartyDataSharing == false)
+                )
                     WalletMethods.addWalletRecord(
                         WalletManager.getWallet,
                         WalletRecordType.WALLET,
@@ -321,8 +342,15 @@ object UnPackIssueCredential {
                     walletModel
                 )
 
-                if (!isDexa || (DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(notification.certificateOffer?.dataAgreementContext?.message?.body).dataPolicy?.thirdPartyDataSharing ==false)){
-                    Toast.makeText(context,context.getString(R.string.data_successfully_added_data_to_the_data_wallet),Toast.LENGTH_LONG).show()
+                if (!isDexa || (DataAgreementContextBodyUtils.convertToDataAgreementBodyOfDexa(
+                        notification.certificateOffer?.dataAgreementContext?.message?.body
+                    ).dataPolicy?.thirdPartyDataSharing == false)
+                ) {
+                    Toast.makeText(
+                        context,
+                        context.getString(R.string.data_successfully_added_data_to_the_data_wallet),
+                        Toast.LENGTH_LONG
+                    ).show()
 
 //                    //custom toast
 //                    val layout: View = context.layoutInflater.inflate(
