@@ -219,16 +219,10 @@ class ConnectionListActivity : BaseActivity(), UrlExtractFragment.ProgressListen
             ConnectionListAdapter(connectionRecords, object :
                 ConnectionClickListener {
                 override fun onConnectionClick(connection: String, did: String) {
-                    val clipboard: ClipboardManager? =
-                        getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager?
-                    val clip = ClipData.newPlainText("DID", did)
-                    clipboard?.setPrimaryClip(clip)
                     val intent =
                         Intent(this@ConnectionListActivity, ConnectionDetailActivity::class.java)
                     intent.putExtra(ConnectionDetailActivity.EXTRA_CONNECTION_DATA, connection)
                     startActivity(intent)
-
-//                    DeleteUtils.deleteConnection(connection)
                 }
             })
         val layoutManager = LinearLayoutManager(this)

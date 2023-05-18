@@ -34,10 +34,15 @@ import org.greenrobot.eventbus.EventBus
 import org.hyperledger.indy.sdk.IndyException
 import org.hyperledger.indy.sdk.anoncreds.Anoncreds
 import org.hyperledger.indy.sdk.non_secrets.WalletRecord
+import io.igrant.data_wallet.adapter.SectionAdapterV2
+import io.igrant.data_wallet.utils.wrappers.CredentialTypes
+import io.igrant.data_wallet.utils.wrappers.ReceiptWrapper
 
 class CertificateDetailActivity : BaseActivity() {
 
-    private lateinit var adapter: SectionAdapter
+    private var address: String? = null
+    private var sectionAdapterV2: SectionAdapterV2? = null
+    private var adapter: SectionAdapter? = null
     private var wallet: WalletModel? = null
 
     private lateinit var toolbar: Toolbar
@@ -144,7 +149,7 @@ class CertificateDetailActivity : BaseActivity() {
             .into(ivCoverUrl)
 
         tvName.text = name
-        tvLocation.text = location
+        tvLocation.text = address?:location
     }
 
     private fun initViews() {
@@ -242,7 +247,8 @@ class CertificateDetailActivity : BaseActivity() {
             }
             R.id.action_visible -> {
                 isBlur = !isBlur
-                adapter.setUpBlur(isBlur)
+                adapter?.setUpBlur(isBlur)
+                sectionAdapterV2?.setUpBlur(isBlur)
                 invalidateOptionsMenu()
             }
             else -> {
@@ -261,6 +267,35 @@ class CertificateDetailActivity : BaseActivity() {
 
     private fun setUpAdapter() {
         val width = DisplayUtils.getScreenWidth() - convertDpToPixel(60f, rvAttributes.context)
+        if (ReceiptWrapper.checkCredentialType(
+                wallet?.credentialProposalDict?.credentialProposal?.attributes ?: ArrayList()
+            ) == CredentialTypes.RECEIPT
+        ) {
+            val receipt = ReceiptWrapper.convertReceipt(
+                wallet?.credentialProposalDict?.credentialProposal?.attributes ?: ArrayList()
+            )
+            if (receipt == null) {
+                setUpV1Adapter()
+            } else {
+                sectionAdapterV2 = SectionAdapterV2(
+                    ReceiptWrapper.getAttributesFromReceipt(receipt),
+                    isBlur,
+                    ReceiptWrapper.getSections(
+                        receipt
+                    )
+                )
+                rvAttributes.layoutManager = LinearLayoutManager(this)
+                rvAttributes.adapter = sectionAdapterV2
+
+                address =  ReceiptWrapper.getShopAddress(receipt)
+                tvHead.visibility = View.INVISIBLE
+            }
+        } else {
+            setUpV1Adapter()
+        }
+    }
+
+    fun setUpV1Adapter() {
         val attributes = getCertificateAttributeListFromWalletModel(wallet)
         adapter = SectionAdapter(
             attributes,

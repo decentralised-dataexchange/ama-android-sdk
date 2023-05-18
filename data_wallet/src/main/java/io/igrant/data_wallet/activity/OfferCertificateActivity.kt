@@ -71,9 +71,15 @@ import java.util.*
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import kotlin.collections.ArrayList
+import io.igrant.data_wallet.adapter.SectionAdapterV2
+import io.igrant.data_wallet.models.reciept.Reciept
+import io.igrant.data_wallet.utils.wrappers.CredentialTypes
+import io.igrant.data_wallet.utils.wrappers.ReceiptWrapper
+import io.igrant.data_wallet.utils.wrappers.ReceiptWrapper.getAttributesFromReceipt
 
 class OfferCertificateActivity : BaseActivity() {
 
+    private var sectionAdapterV2: SectionAdapterV2? = null
     private var notification: Notification? = null
     private var goToHome: Boolean = false
     private var name: String = ""
@@ -97,7 +103,7 @@ class OfferCertificateActivity : BaseActivity() {
 
     private var isBlur: Boolean = true
 
-    private lateinit var adapter: SectionAdapter
+    private var adapter: SectionAdapter? = null
 
     private var isTempPreview = false
 
@@ -540,6 +546,31 @@ class OfferCertificateActivity : BaseActivity() {
 //            60f,
 //            rvAttributes.context
 //        )
+        if (ReceiptWrapper.checkCredentialType(
+                mCertificateOffer!!.credentialPreview!!.attributes ?: ArrayList()
+            ) == CredentialTypes.RECEIPT
+        ) {
+            val receipt = ReceiptWrapper.convertReceipt(
+                mCertificateOffer!!.credentialPreview!!.attributes ?: ArrayList()
+            )
+            if (receipt == null) {
+                setupV1Adapter()
+            } else {
+                sectionAdapterV2 = SectionAdapterV2(
+                    getAttributesFromReceipt(receipt),
+                    isBlur,
+                    ReceiptWrapper.getSections(receipt)
+                )
+                rvAttributes.layoutManager = LinearLayoutManager(this)
+                rvAttributes.adapter = sectionAdapterV2
+            }
+        } else {
+            setupV1Adapter()
+        }
+
+    }
+
+    fun setupV1Adapter() {
         adapter = SectionAdapter(
             if (notification?.type == MessageTypes.TYPE_EBSI_CREDENTIAL)
                 mapToList(
@@ -584,7 +615,8 @@ class OfferCertificateActivity : BaseActivity() {
 
             R.id.action_visible -> {
                 isBlur = !isBlur
-                adapter.setUpBlur(isBlur)
+                adapter?.setUpBlur(isBlur)
+                sectionAdapterV2?.setUpBlur(isBlur)
                 invalidateOptionsMenu()
             }
 
