@@ -113,6 +113,23 @@ Then add the below code to Wallet SDK initialize callback -> InitializeWalletSta
     }
 ````
 
+### Connect to Organization
+To connect to an organization without the UI
+````
+DataWallet.saveConnection(
+                Uri.parse(<URL with query parameter c_i>),
+                object : ConnectionCallback {
+                    override fun success(connectionId: String) {
+
+                    }
+
+                    override fun failure(reason: String?) {
+                        
+                    }
+                }
+            )
+````
+
 ### Subscribe to notifications
 To override the notifications you can use notification listener
 
