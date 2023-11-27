@@ -2,6 +2,7 @@ package io.igrant.data_wallet.utils
 
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import android.system.ErrnoException
 import android.system.Os
 import android.util.Log
@@ -20,6 +21,7 @@ import kotlinx.coroutines.withContext
 import org.hyperledger.indy.sdk.LibIndy
 import java.io.File
 import io.igrant.data_wallet.indy.PoolUtils
+import io.igrant.data_wallet.utils.connection.ConnectionUtils
 
 object DataWallet {
 
@@ -154,10 +156,19 @@ object DataWallet {
 
         }
     }
+
+    fun saveConnection(uri: Uri, connectionCallback: ConnectionCallback) {
+        ConnectionUtils.saveConnection(uri, connectionCallback)
+    }
 }
 
 interface InitializeWalletCallback {
     fun progressUpdate(progress: Int) {}
+}
+
+interface ConnectionCallback {
+    fun success(connectionId: String)
+    fun failure(reason: String?)
 }
 
 object InitializeWalletState {
