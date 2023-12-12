@@ -31,18 +31,24 @@ import okhttp3.ResponseBody
 import okio.BufferedSink
 import org.hyperledger.indy.sdk.crypto.Crypto
 import org.hyperledger.indy.sdk.did.Did
+import org.hyperledger.indy.sdk.non_secrets.WalletRecord
+import org.hyperledger.indy.sdk.wallet.Wallet
 import org.json.JSONObject
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 import java.io.IOException
 import java.util.*
+import kotlin.collections.ArrayList
 
 object ConnectionUtils {
 
     private var requestId: String? = ""
 
-    fun saveConnection(uri: Uri, connectionCallback: ConnectionCallback) {
+    fun saveConnection(
+        uri: Uri, connectionCallback: ConnectionCallback,
+        isDeleteEnabled: Boolean
+    ) {
         val invitationString: String = uri.getQueryParameter("c_i") ?: ""
         var invitation: Invitation? = null
         var connectionType: String? = ""
@@ -89,18 +95,42 @@ object ConnectionUtils {
 
                                         if ((connectionListSearch.totalCount ?: 0) > 0) {
 
-                                            val connectionObject = WalletManager.getGson.fromJson(
-                                                connectionListSearch.records?.get(0)?.value,
-                                                MediatorConnectionObject::class.java
-                                            )
-                                            sendDidToConnection(
-                                                connectionObject.theirDid,
-                                                connectionType,
-                                                myKey,
-                                                invitation,
-                                                orgId,
-                                                connectionCallback
-                                            )
+                                            if (isDeleteEnabled) {
+                                                for (connection in connectionListSearch.records
+                                                    ?: ArrayList()) {
+                                                    WalletRecord.delete(
+                                                        WalletManager.getWallet,
+                                                        WalletRecordType.CONNECTION,
+                                                        "${connection.id}"
+                                                    ).get()
+                                                }
+
+                                                saveConnection(
+                                                    invitation,
+                                                    connectionType,
+                                                    protocol,
+                                                    myDid,
+                                                    myKey,
+                                                    orgId,
+                                                    requestId,
+                                                    location,
+                                                    connectionCallback
+                                                )
+                                            } else {
+                                                val connectionObject =
+                                                    WalletManager.getGson.fromJson(
+                                                        connectionListSearch.records?.get(0)?.value,
+                                                        MediatorConnectionObject::class.java
+                                                    )
+                                                sendDidToConnection(
+                                                    connectionObject.theirDid,
+                                                    connectionType,
+                                                    myKey,
+                                                    invitation,
+                                                    orgId,
+                                                    connectionCallback
+                                                )
+                                            }
                                         }
                                     }
                                 } else {
@@ -356,7 +386,7 @@ object ConnectionUtils {
 
                                 checkExistingConnection(
                                     connectionData.orgId ?: "",
-                                    connectionData.location?:"",
+                                    connectionData.location ?: "",
                                     connectionUtilCallback
                                 )
                             }
@@ -364,7 +394,7 @@ object ConnectionUtils {
                     })
             }
             else -> {
-                connectionUtilCallback.isExistingConnectionPresent(false, null,null)
+                connectionUtilCallback.isExistingConnectionPresent(false, null, null)
             }
         }
     }
@@ -384,13 +414,13 @@ object ConnectionUtils {
 
             if ((connectionListSearch.totalCount ?: 0) > 0) {
 
-                connectionUtilCallback.isExistingConnectionPresent(true, mOrgId,location)
+                connectionUtilCallback.isExistingConnectionPresent(true, mOrgId, location)
 
             } else {
-                connectionUtilCallback.isExistingConnectionPresent(false, mOrgId,location)
+                connectionUtilCallback.isExistingConnectionPresent(false, mOrgId, location)
             }
         } else {
-            connectionUtilCallback.isExistingConnectionPresent(false, mOrgId,location)
+            connectionUtilCallback.isExistingConnectionPresent(false, mOrgId, location)
         }
     }
 
@@ -558,7 +588,9 @@ object ConnectionUtils {
                                                                                 call: Call<ResponseBody>,
                                                                                 t: Throwable
                                                                             ) {
-                                                                                connectionCallback.failure("")
+                                                                                connectionCallback.failure(
+                                                                                    ""
+                                                                                )
                                                                             }
 
                                                                             override fun onResponse(
@@ -600,5 +632,5 @@ object ConnectionUtils {
 interface ConnectionUtilCallback {
     fun returnProtocols(protocol: ArrayList<Protocol>?)
     fun error(message: String?)
-    fun isExistingConnectionPresent(isPresent: Boolean, orgId: String?,location:String?)
+    fun isExistingConnectionPresent(isPresent: Boolean, orgId: String?, location: String?)
 }

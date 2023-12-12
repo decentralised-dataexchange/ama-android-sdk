@@ -157,8 +157,11 @@ object DataWallet {
         }
     }
 
-    fun saveConnection(uri: Uri, connectionCallback: ConnectionCallback) {
-        ConnectionUtils.saveConnection(uri, connectionCallback)
+    fun saveConnection(
+        uri: Uri, connectionCallback: ConnectionCallback,
+        isDeletedEnabled: Boolean? = true
+    ) {
+        ConnectionUtils.saveConnection(uri, connectionCallback, isDeletedEnabled == true)
     }
 }
 
